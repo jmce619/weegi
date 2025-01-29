@@ -185,19 +185,16 @@ const reshapeProduct = (product: ShopifyProduct, filterHiddenProducts: boolean =
   };
 };
 
-const reshapeProducts = (products: ShopifyProduct[]) => {
+const reshapeProducts = (products: ShopifyProduct[], filterHidden = true) => {
   const reshapedProducts = [];
-
   for (const product of products) {
     if (product) {
-      const reshapedProduct = reshapeProduct(product);
-
+      const reshapedProduct = reshapeProduct(product, filterHidden);
       if (reshapedProduct) {
         reshapedProducts.push(reshapedProduct);
       }
     }
   }
-
   return reshapedProducts;
 };
 
@@ -419,7 +416,7 @@ export async function getProducts({
     }
   });
 
-  return reshapeProducts(removeEdgesAndNodes(res.body.data.products));
+  return reshapeProducts(removeEdgesAndNodes(res.body.data.products),false);
 }
 
 // This is called from `app/api/revalidate.ts` so providers can control revalidation logic.
