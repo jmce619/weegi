@@ -1,38 +1,28 @@
 import { getProducts } from 'lib/shopify';
 import Image from 'next/image';
 import Link from 'next/link';
-
-// async function fetchStockData() {
-//   // 1. Query your backend, external API, or local JSON for stock data
-//   //    This is just an example. Replace with your real data fetching logic.
-//   return [
-//     { date: '2023-01-01', price: 100 },
-//     { date: '2023-01-02', price: 101 },
-//     { date: '2023-01-03', price: 98 },
-//     { date: '2023-01-04', price: 105 },
-//     // ... more data points
-//   ];
-// }
+import ChartSection from './ChartSection';
 
 export default async function HomePage() {
-  // Fetch all products (up to 100) via the Storefront API
   const products = await getProducts({});
-  console.log('PRODUCTS LENGTH:', products.length);
-
-  // If there are no products, show a fallback
-  if (!products || products.length === 0) {
+  if (!products?.length) {
     return <p className="p-6 text-center">No products found.</p>;
   }
 
   return (
     <main className="mx-auto max-w-7xl p-4">
-      <h1 className="mb-6 text-2xl font-bold">All Products</h1>
+      <h1 className="mb-4 text-2xl font-bold">My Combined Charts</h1>
 
-      {/* Grid with 3 columns, creating multiple rows as needed */}
-      <div className="grid grid-cols-4 gap-6">
+      {/* ChartSection is a client component rendering UNH vs MFI charts */}
+      <ChartSection />
+
+      <hr className="my-8" />
+
+      {/* Display products in a 3-column grid */}
+      <h2 className="mb-6 text-2xl font-bold">All Products</h2>
+      <div className="grid grid-cols-3 gap-6">
         {products.map((product) => {
           const firstImage = product.images?.[0];
-
           return (
             <Link
               key={product.handle}
@@ -53,15 +43,7 @@ export default async function HomePage() {
                   </div>
                 )}
               </div>
-
-              <h2 className="mb-1 font-medium">{product.title}</h2>
-              {/* Optional: display product price */}
-              {product.priceRange?.minVariantPrice?.amount && (
-                <p className="text-sm text-neutral-700">
-                  ${product.priceRange.minVariantPrice.amount}{' '}
-                  {product.priceRange.minVariantPrice.currencyCode}
-                </p>
-              )}
+              <h3 className="mb-1 font-medium">{product.title}</h3>
             </Link>
           );
         })}

@@ -8,9 +8,9 @@ import { useState } from 'react';
 /** Example static menu items. Replace with your real data if you wish. */
 const menu = [
   { title: 'Shop', path: '/shop' },
-  { title: 'HealthCare Insurance Data', path: '/study1' },
+  { title: 'Healthcare Insurance Data', path: '/Study-1' },
   { title: 'Donate', path: '/Donate' },
-  { title: 'Contact', path: '/contact' }
+  { title: 'About', path: '/About' }
 ];
 
 export function Navbar() {

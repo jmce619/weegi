@@ -413,10 +413,15 @@ export async function getProducts({
       query,
       reverse,
       sortKey
-    }
+    },
+    /** 
+     * IMPORTANT: Force "no-store" so we don't cache the response. 
+     * This ensures immediate real-time data on each request.
+     */
+    cache: 'no-store'
   });
 
-  return reshapeProducts(removeEdgesAndNodes(res.body.data.products),false);
+  return reshapeProducts(removeEdgesAndNodes(res.body.data.products));
 }
 
 // This is called from `app/api/revalidate.ts` so providers can control revalidation logic.
