@@ -177,6 +177,7 @@ const reshapeProduct = (product: ShopifyProduct, filterHiddenProducts: boolean =
   }
 
   const { images, variants, ...rest } = product;
+  console.log('DEBUG product fields:\n', JSON.stringify(product, null, 2));
 
   return {
     ...rest,
@@ -293,12 +294,9 @@ export async function getCollectionProducts({
 }): Promise<Product[]> {
   const res = await shopifyFetch<ShopifyCollectionProductsOperation>({
     query: getCollectionProductsQuery,
+    variables: { handle: collection, reverse, sortKey },
     tags: [TAGS.collections, TAGS.products],
-    variables: {
-      handle: collection,
-      reverse,
-      sortKey: sortKey === 'CREATED_AT' ? 'CREATED' : sortKey
-    }
+    cache: 'no-store', // <-- important
   });
 
   if (!res.body.data.collection) {
@@ -312,7 +310,8 @@ export async function getCollectionProducts({
 export async function getCollections(): Promise<Collection[]> {
   const res = await shopifyFetch<ShopifyCollectionsOperation>({
     query: getCollectionsQuery,
-    tags: [TAGS.collections]
+    tags: [TAGS.collections],
+    cache: 'no-store', // <-- important
   });
   const shopifyCollections = removeEdgesAndNodes(res.body?.data?.collections);
   const collections = [
