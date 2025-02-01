@@ -1,6 +1,5 @@
 // app/page.tsx
 import { getProducts } from 'lib/shopify';
-import Image from 'next/image';
 import Link from 'next/link';
 import ChartSection from './ChartSection';
 
@@ -12,6 +11,7 @@ export default async function HomePage() {
   }
 
   return (
+    
     <main className="mx-auto max-w-7xl p-4">
 
       {/* 2) Render the client-side chart section */}
@@ -27,7 +27,7 @@ export default async function HomePage() {
 
       {/* 3) Display products in a 3-column grid */}
       <h2 className="mb-6 text-2xl font-bold">All Products</h2>
-      <div className="grid grid-cols-3 gap-6">
+      {/* <div className="grid grid-cols-3 gap-6">
         {products.map((product) => {
           const firstImage = product.images?.[0];
           return (
@@ -54,7 +54,7 @@ export default async function HomePage() {
             </Link>
           );
         })}
-      </div>
+      </div> */}
     </main>
   );
 }
