@@ -41,8 +41,11 @@ function mergeAsOf(
     // Move forward in MFI while next MFI date <= dayTime
     while (
       mfiIndex < mfiSorted.length - 1 &&
-      parseDate(mfiSorted[mfiIndex + 1].Date).getTime() <= dayTime
+      parseDate(mfiSorted[mfiIndex + 1]!.Date).getTime() <= dayTime
     ) {
+      mfiIndex++;
+    }
+    
       mfiIndex++;
     }
 
