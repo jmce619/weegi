@@ -45,9 +45,6 @@ function mergeAsOf(
     ) {
       mfiIndex++;
     }
-    
-      mfiIndex++;
-    }
 
     merged.push({
       Date: day.Date,
