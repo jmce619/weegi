@@ -38,18 +38,25 @@ function mergeAsOf(
   for (const day of unhSorted) {
     const dayTime = parseDate(day.Date).getTime();
 
-    // Move forward in MFI while next MFI date <= current daily date
-    while (
-      mfiIndex < mfiSorted.length - 1 &&
-      parseDate(mfiSorted[mfiIndex + 1]!.Date).getTime() <= dayTime
-    ) {
-      mfiIndex++;
+    // Explicitly check that the next element exists before accessing it.
+    while (mfiIndex < mfiSorted.length - 1) {
+      const nextMfi = mfiSorted[mfiIndex + 1];
+      // If nextMfi is defined and its date is less than or equal to the current day, then advance.
+      if (nextMfi && parseDate(nextMfi.Date).getTime() <= dayTime) {
+        mfiIndex++;
+      } else {
+        break;
+      }
     }
 
+    // currentMfi will be defined because:
+    // - mfiSorted has at least one element (we check this earlier in the component),
+    // - and mfiIndex is kept in bounds.
+    const currentMfi = mfiSorted[mfiIndex];
     merged.push({
       Date: day.Date,
       Close: day.Close,
-      Income: mfiSorted[mfiIndex]!.Income
+      Income: currentMfi ? currentMfi.Income : 0
     });
   }
 
@@ -64,24 +71,23 @@ function cumulativePercentChange(
 ) {
   if (!data.length) return [];
 
-  // Sorting ensures that the earliest date is at index 0.
   const sorted = [...data].sort(
     (a, b) => parseDate(a.Date).getTime() - parseDate(b.Date).getTime()
   );
+  // Since data is not empty, sorted[0] exists.
   const firstClose = sorted[0]!.Close;
   const firstIncome = sorted[0]!.Income;
 
   return sorted.map((row) => ({
     Date: row.Date,
-    // (UNH)
     CumClose: ((row.Close - firstClose) / firstClose) * 100,
-    // (MFI)
     CumIncome: ((row.Income - firstIncome) / firstIncome) * 100
   }));
 }
 
 /**
- * Year-over-year %: group daily data by year => last day => yoy = (thisYear - lastYear)/lastYear * 100
+ * Year-over-year % change: groups daily data by year (using the last day for each year)
+ * and calculates YoY change from the previous year.
  */
 function yearOverYearChange(
   data: Array<{ Date: string; Close: number; Income: number }>
@@ -93,9 +99,10 @@ function yearOverYearChange(
   );
   const yearMap = new Map<number, { Date: string; Close: number; Income: number }>();
 
+  // Use the last day in the sorted order for each year.
   for (const row of sorted) {
     const y = parseDate(row.Date).getFullYear();
-    yearMap.set(y, row); // Overwrite – keeping the last day of each year
+    yearMap.set(y, row);
   }
 
   const yearlyArr = Array.from(yearMap.entries()).map(([year, row]) => ({
@@ -107,8 +114,8 @@ function yearOverYearChange(
 
   const output = [];
   for (let i = 1; i < yearlyArr.length; i++) {
-    const prev = yearlyArr[i - 1];
-    const curr = yearlyArr[i];
+    const prev = yearlyArr[i - 1]!;
+    const curr = yearlyArr[i]!;
     const yoyClose = ((curr.Close - prev.Close) / prev.Close) * 100;
     const yoyIncome = ((curr.Income - prev.Income) / prev.Income) * 100;
     output.push({
@@ -129,13 +136,13 @@ export default function ChartSection() {
     return <p>No chart data available</p>;
   }
 
-  // 2) Merge daily UNH + monthly MFI => daily array {Date, Close, Income}
+  // 2) Merge daily UNH with monthly MFI data.
   const mergedDaily = useMemo(() => mergeAsOf(unhData, mfiData), [unhData, mfiData]);
   if (!mergedDaily.length) {
     return <p>No merged data found</p>;
   }
 
-  // 3) Compute transformations
+  // 3) Compute cumulative and year-over-year data transformations.
   const cumData = useMemo(() => cumulativePercentChange(mergedDaily), [mergedDaily]);
   const yoyData = useMemo(() => yearOverYearChange(mergedDaily), [mergedDaily]);
 
