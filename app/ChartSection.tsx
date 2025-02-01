@@ -38,7 +38,7 @@ function mergeAsOf(
   for (const day of unhSorted) {
     const dayTime = parseDate(day.Date).getTime();
 
-    // Move forward in MFI while next MFI date <= dayTime
+    // Move forward in MFI while next MFI date <= current daily date
     while (
       mfiIndex < mfiSorted.length - 1 &&
       parseDate(mfiSorted[mfiIndex + 1]!.Date).getTime() <= dayTime
@@ -51,7 +51,6 @@ function mergeAsOf(
       Close: day.Close,
       Income: mfiSorted[mfiIndex]!.Income
     });
-    
   }
 
   return merged;
@@ -60,12 +59,17 @@ function mergeAsOf(
 /**
  * Cumulative % change from earliest date: ((val - firstVal)/firstVal)*100
  */
-function cumulativePercentChange(data: Array<{ Date: string; Close: number; Income: number }>) {
+function cumulativePercentChange(
+  data: Array<{ Date: string; Close: number; Income: number }>
+) {
   if (!data.length) return [];
 
-  const sorted = [...data].sort((a, b) => parseDate(a.Date).getTime() - parseDate(b.Date).getTime());
-  const firstClose = sorted[0].Close;
-  const firstIncome = sorted[0].Income;
+  // Sorting ensures that the earliest date is at index 0.
+  const sorted = [...data].sort(
+    (a, b) => parseDate(a.Date).getTime() - parseDate(b.Date).getTime()
+  );
+  const firstClose = sorted[0]!.Close;
+  const firstIncome = sorted[0]!.Income;
 
   return sorted.map((row) => ({
     Date: row.Date,
@@ -77,17 +81,21 @@ function cumulativePercentChange(data: Array<{ Date: string; Close: number; Inco
 }
 
 /**
- * Year-over-year %: group daily data by year => last day => yoy = (thisYear - lastYear)/ lastYear * 100
+ * Year-over-year %: group daily data by year => last day => yoy = (thisYear - lastYear)/lastYear * 100
  */
-function yearOverYearChange(data: Array<{ Date: string; Close: number; Income: number }>) {
+function yearOverYearChange(
+  data: Array<{ Date: string; Close: number; Income: number }>
+) {
   if (!data.length) return [];
 
-  const sorted = [...data].sort((a, b) => parseDate(a.Date).getTime() - parseDate(b.Date).getTime());
+  const sorted = [...data].sort(
+    (a, b) => parseDate(a.Date).getTime() - parseDate(b.Date).getTime()
+  );
   const yearMap = new Map<number, { Date: string; Close: number; Income: number }>();
 
   for (const row of sorted) {
     const y = parseDate(row.Date).getFullYear();
-    yearMap.set(y, row); // Overwrite => last day that year
+    yearMap.set(y, row); // Overwrite – keeping the last day of each year
   }
 
   const yearlyArr = Array.from(yearMap.entries()).map(([year, row]) => ({
@@ -142,7 +150,6 @@ export default function ChartSection() {
             <XAxis dataKey="Date" />
             <YAxis />
             <Tooltip />
-            {/* Legend top-left */}
             <Legend verticalAlign="top" align="left" />
             <Line
               type="monotone"
