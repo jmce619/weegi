@@ -49,8 +49,9 @@ function mergeAsOf(
     merged.push({
       Date: day.Date,
       Close: day.Close,
-      Income: mfiSorted[mfiIndex].Income
+      Income: mfiSorted[mfiIndex]!.Income
     });
+    
   }
 
   return merged;
