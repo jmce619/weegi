@@ -76,8 +76,8 @@ function cumulativePercentChange(
   const firstClose = sorted[0]!.Close;
   const firstIncome = sorted[0]!.Income;
 
-  // Start with the baseline record
-  const result = [{ Date: sorted[0].Date, CumClose: 0, CumIncome: 0 }];
+  // Start with the baseline record (assert that sorted[0] is defined)
+  const result = [{ Date: sorted[0]!.Date, CumClose: 0, CumIncome: 0 }];
   let prevIncome = firstIncome;
 
   // Only update cumulative values when income changes
@@ -232,15 +232,15 @@ export default function ChartSection() {
           backgroundPosition: 'center'
         }}
       >
-        {/* Use an overlay div for contrast */}
-        <div className="w-full h-full flex flex-col items-center justify-center bg-white bg-opacity-50 p-4 rounded">
-          <h3 className="text-xl font-semibold text-black mb-2">More Data</h3>
-          <p className="mb-4 text-center text-black">
+        {/* Overlay for better contrast */}
+        <div className="w-full h-full flex flex-col items-center justify-center bg-black bg-opacity-50 p-4 rounded">
+          <h3 className="text-xl font-semibold text-white mb-2">More Data</h3>
+          <p className="mb-4 text-center text-white">
             Dive deeper into additional healthcare insurance data and charts.
           </p>
           <Link
             href="/Study-1"
-            className="inline-block rounded-md bg-red-600 px-4 py-2 text-white hover:bg-red-700"
+            className="inline-block rounded-md bg-red-600 px-4 py-2 text-white hover:bg-red-700 transition"
           >
             Explore
           </Link>
