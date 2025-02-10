@@ -76,13 +76,13 @@ function cumulativePercentChange(
   const firstClose = sorted[0]!.Close;
   const firstIncome = sorted[0]!.Income;
 
-  // Start with the baseline record (assert that sorted[0] is defined)
+  // Start with the baseline record (using non-null assertion for sorted[0])
   const result = [{ Date: sorted[0]!.Date, CumClose: 0, CumIncome: 0 }];
   let prevIncome = firstIncome;
 
   // Only update cumulative values when income changes
   for (let i = 1; i < sorted.length; i++) {
-    const row = sorted[i];
+    const row = sorted[i]!; // assert row is not undefined
     if (row.Income !== prevIncome) {
       const cumIncome = ((row.Income - firstIncome) / firstIncome) * 100;
       const cumClose = ((row.Close - firstClose) / firstClose) * 100;
@@ -227,12 +227,12 @@ export default function ChartSection() {
       <div
         className="col-span-1 flex items-center justify-center p-0 rounded shadow-sm"
         style={{
-          backgroundImage: "url('/images/your-background.png')",
+          backgroundImage: "url('/images/your-background.jpg')",
           backgroundSize: 'cover',
           backgroundPosition: 'center'
         }}
       >
-        {/* Overlay for better contrast */}
+        {/* Overlay for contrast */}
         <div className="w-full h-full flex flex-col items-center justify-center bg-black bg-opacity-50 p-4 rounded">
           <h3 className="text-xl font-semibold text-white mb-2">More Data</h3>
           <p className="mb-4 text-center text-white">
