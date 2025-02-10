@@ -1,6 +1,7 @@
+// app/Study-1/page.tsx
 'use client';
 
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import {
     CartesianGrid,
     Legend,
@@ -11,196 +12,282 @@ import {
     XAxis,
     YAxis
 } from 'recharts';
-import combinedData from '../data/combined_data.json';
+import combinedData from '../data/combined_stock_income.json';
 
-/** Parse YYYY-MM-DD string to Date */
+/** Helper: Convert a "YYYY-MM-DD" string into a Date object */
 function parseDate(dateStr: string): Date {
   return new Date(dateStr + 'T00:00:00');
 }
 
 /**
- * Merge monthly MFI into daily UNH "as of" each day.
+ * Merge the daily stock data with the median income data.
+ * We use UNH’s daily data as the base.
+ * For each daily record we also:
+ *   - Pull the corresponding values from Centene, Cigna, and Aetna by index.
+ *   - "As‑of" merge the median income data: pick the most recent income record
+ *     whose Date is ≤ the daily record’s Date.
  */
-function mergeAsOf(
-  dailyUNH: { Date: string; Close: number }[],
-  monthlyMFI: { Date: string; Income: number }[]
-) {
-  const unhSorted = [...dailyUNH].sort(
+function mergeStockAndIncomeData() {
+  const unhData = combinedData.unh_data || [];
+  const centeneData = combinedData.centene_data || [];
+  const cignaData = combinedData.cigna_data || [];
+  const aetnaData = combinedData.aetna_data || [];
+  const incomeData = combinedData.median_income || [];
+
+  // Ensure income data is sorted (ascending)
+  const sortedIncome = [...incomeData].sort(
     (a, b) => parseDate(a.Date).getTime() - parseDate(b.Date).getTime()
   );
-  const mfiSorted = [...monthlyMFI].sort(
-    (a, b) => parseDate(a.Date).getTime() - parseDate(b.Date).getTime()
-  );
 
-  let mfiIndex = 0;
-  const merged: Array<{ Date: string; Close: number; Income: number }> = [];
-
-  for (const day of unhSorted) {
-    const dayTime = parseDate(day.Date).getTime();
-
-    // Explicitly check that the next element exists before accessing it.
-    while (mfiIndex < mfiSorted.length - 1) {
-      const nextMfi = mfiSorted[mfiIndex + 1];
-      // If nextMfi is defined and its date is less than or equal to the current day, then advance.
-      if (nextMfi && parseDate(nextMfi.Date).getTime() <= dayTime) {
-        mfiIndex++;
-      } else {
-        break;
-      }
+  let incomeIndex = 0;
+  const merged = unhData.map((record, i) => {
+    const currentDate = parseDate(record.Date);
+    // Advance incomeIndex if the next income record is not later than the current date.
+    while (
+      incomeIndex < sortedIncome.length - 1 &&
+      parseDate(sortedIncome[incomeIndex + 1].Date).getTime() <= currentDate.getTime()
+    ) {
+      incomeIndex++;
     }
-
-    // currentMfi will be defined because:
-    // - mfiSorted has at least one element (we check this earlier in the component),
-    // - and mfiIndex is kept in bounds.
-    const currentMfi = mfiSorted[mfiIndex];
-    merged.push({
-      Date: day.Date,
-      Close: day.Close,
-      Income: currentMfi ? currentMfi.Income : 0
-    });
-  }
-
+    return {
+      Date: record.Date,
+      UNH: record.Close,
+      Centene: centeneData[i] ? centeneData[i].Close : null,
+      Cigna: cignaData[i] ? cignaData[i].Close : null,
+      Aetna: aetnaData[i] ? aetnaData[i].Close : null,
+      Income: sortedIncome[incomeIndex] ? sortedIncome[incomeIndex].Income : null
+    };
+  });
   return merged;
 }
 
 /**
- * Cumulative % change from earliest date: ((val - firstVal)/firstVal)*100
+ * Compute the cumulative percentage change relative to the first value.
  */
 function cumulativePercentChange(
-  data: Array<{ Date: string; Close: number; Income: number }>
+  data: Array<{
+    Date: string;
+    UNH: number;
+    Centene: number | null;
+    Cigna: number | null;
+    Aetna: number | null;
+    Income: number;
+  }>
 ) {
   if (!data.length) return [];
-
   const sorted = [...data].sort(
     (a, b) => parseDate(a.Date).getTime() - parseDate(b.Date).getTime()
   );
-  // Since data is not empty, sorted[0] exists.
-  const firstClose = sorted[0]!.Close;
-  const firstIncome = sorted[0]!.Income;
+  const firstUNH = sorted[0].UNH;
+  const firstCentene = sorted[0].Centene;
+  const firstCigna = sorted[0].Cigna;
+  const firstAetna = sorted[0].Aetna;
+  const firstIncome = sorted[0].Income;
 
-  return sorted.map((row) => ({
+  return sorted.map(row => ({
     Date: row.Date,
-    CumClose: ((row.Close - firstClose) / firstClose) * 100,
+    CumUNH: ((row.UNH - firstUNH) / firstUNH) * 100,
+    CumCentene:
+      firstCentene !== null && row.Centene !== null
+        ? ((row.Centene - firstCentene) / firstCentene) * 100
+        : null,
+    CumCigna:
+      firstCigna !== null && row.Cigna !== null
+        ? ((row.Cigna - firstCigna) / firstCigna) * 100
+        : null,
+    CumAetna:
+      firstAetna !== null && row.Aetna !== null
+        ? ((row.Aetna - firstAetna) / firstAetna) * 100
+        : null,
     CumIncome: ((row.Income - firstIncome) / firstIncome) * 100
   }));
 }
 
 /**
- * Year-over-year % change: groups daily data by year (using the last day for each year)
- * and calculates YoY change from the previous year.
+ * Compute the "rebased to 100" values.
+ * Each series is scaled so that its first value becomes 100.
  */
-function yearOverYearChange(
-  data: Array<{ Date: string; Close: number; Income: number }>
+function rebaseTo100(
+  data: Array<{
+    Date: string;
+    UNH: number;
+    Centene: number | null;
+    Cigna: number | null;
+    Aetna: number | null;
+    Income: number;
+  }>
 ) {
   if (!data.length) return [];
-
   const sorted = [...data].sort(
     (a, b) => parseDate(a.Date).getTime() - parseDate(b.Date).getTime()
   );
-  const yearMap = new Map<number, { Date: string; Close: number; Income: number }>();
+  const firstUNH = sorted[0].UNH;
+  const firstCentene = sorted[0].Centene;
+  const firstCigna = sorted[0].Cigna;
+  const firstAetna = sorted[0].Aetna;
+  const firstIncome = sorted[0].Income;
 
-  // Use the last day in the sorted order for each year.
-  for (const row of sorted) {
-    const y = parseDate(row.Date).getFullYear();
-    yearMap.set(y, row);
-  }
-
-  const yearlyArr = Array.from(yearMap.entries()).map(([year, row]) => ({
-    year,
-    Close: row.Close,
-    Income: row.Income
+  return sorted.map(row => ({
+    Date: row.Date,
+    RebUNH: (row.UNH / firstUNH) * 100,
+    RebCentene:
+      firstCentene !== null && row.Centene !== null ? (row.Centene / firstCentene) * 100 : null,
+    RebCigna:
+      firstCigna !== null && row.Cigna !== null ? (row.Cigna / firstCigna) * 100 : null,
+    RebAetna:
+      firstAetna !== null && row.Aetna !== null ? (row.Aetna / firstAetna) * 100 : null,
+    RebIncome: (row.Income / firstIncome) * 100
   }));
-  yearlyArr.sort((a, b) => a.year - b.year);
-
-  const output = [];
-  for (let i = 1; i < yearlyArr.length; i++) {
-    const prev = yearlyArr[i - 1]!;
-    const curr = yearlyArr[i]!;
-    const yoyClose = ((curr.Close - prev.Close) / prev.Close) * 100;
-    const yoyIncome = ((curr.Income - prev.Income) / prev.Income) * 100;
-    output.push({
-      Date: String(curr.year),
-      YoYClose: yoyClose,
-      YoYIncome: yoyIncome
-    });
-  }
-  return output;
 }
 
-export default function ChartSection() {
-  // 1) Extract UNH + MFI arrays from the JSON
-  const unhData = combinedData.unh_data || [];
-  const mfiData = combinedData.median_income || [];
+/**
+ * Compute the Year-over-Year percentage change.
+ * We group by year (using the last available daily record of that year)
+ * and compare each year to the previous.
+ */
+function yearOverYearChange(
+  data: Array<{
+    Date: string;
+    UNH: number;
+    Centene: number | null;
+    Cigna: number | null;
+    Aetna: number | null;
+    Income: number;
+  }>
+) {
+  if (!data.length) return [];
+  const sorted = [...data].sort(
+    (a, b) => parseDate(a.Date).getTime() - parseDate(b.Date).getTime()
+  );
 
-  if (!unhData.length || !mfiData.length) {
-    return <p>No chart data available</p>;
+  // Group the data by year using the last record for each year.
+  const yearly = new Map<number, typeof sorted[0]>();
+  sorted.forEach(record => {
+    const year = parseDate(record.Date).getFullYear();
+    yearly.set(year, record);
+  });
+
+  const years = Array.from(yearly.keys()).sort();
+  const results = [];
+  for (let i = 1; i < years.length; i++) {
+    const prevYear = years[i - 1];
+    const currYear = years[i];
+    const prevRecord = yearly.get(prevYear)!;
+    const currRecord = yearly.get(currYear)!;
+    results.push({
+      Date: String(currYear),
+      YoYUNH: ((currRecord.UNH - prevRecord.UNH) / prevRecord.UNH) * 100,
+      YoYCentene:
+        prevRecord.Centene !== null && currRecord.Centene !== null
+          ? ((currRecord.Centene - prevRecord.Centene) / prevRecord.Centene) * 100
+          : null,
+      YoYCigna:
+        prevRecord.Cigna !== null && currRecord.Cigna !== null
+          ? ((currRecord.Cigna - prevRecord.Cigna) / prevRecord.Cigna) * 100
+          : null,
+      YoYAetna:
+        prevRecord.Aetna !== null && currRecord.Aetna !== null
+          ? ((currRecord.Aetna - prevRecord.Aetna) / prevRecord.Aetna) * 100
+          : null,
+      YoYIncome: ((currRecord.Income - prevRecord.Income) / prevRecord.Income) * 100
+    });
   }
+  return results;
+}
 
-  // 2) Merge daily UNH with monthly MFI data.
-  const mergedDaily = useMemo(() => mergeAsOf(unhData, mfiData), [unhData, mfiData]);
-  if (!mergedDaily.length) {
-    return <p>No merged data found</p>;
-  }
+export default function StudyOnePage() {
+  // Set the active tab to one of three options.
+  const [activeTab, setActiveTab] = useState<'cumulative' | 'rebased' | 'yoy'>('cumulative');
 
-  // 3) Compute cumulative and year-over-year data transformations.
-  const cumData = useMemo(() => cumulativePercentChange(mergedDaily), [mergedDaily]);
-  const yoyData = useMemo(() => yearOverYearChange(mergedDaily), [mergedDaily]);
+  // Merge the stock and income data
+  const mergedData = useMemo(() => mergeStockAndIncomeData(), []);
+
+  // Compute the three transformations
+  const cumData = useMemo(() => cumulativePercentChange(mergedData), [mergedData]);
+  const rebData = useMemo(() => rebaseTo100(mergedData), [mergedData]);
+  const yoyData = useMemo(() => yearOverYearChange(mergedData), [mergedData]);
 
   return (
-    <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-      {/* Left: Cumulative % chart */}
-      <div className="w-full h-[500px] border p-2">
-        <h2 className="mb-2 text-lg font-semibold">Cumulative % Change</h2>
-        <ResponsiveContainer width="100%" height="100%">
-          <LineChart data={cumData}>
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="Date" />
-            <YAxis />
-            <Tooltip />
-            <Legend verticalAlign="top" align="left" />
-            <Line
-              type="monotone"
-              dataKey="CumClose"
-              name="United Healthcare Stock Price"
-              stroke="red"
-              dot={false}
-            />
-            <Line
-              type="monotone"
-              dataKey="CumIncome"
-              name="Median Family Income (U.S.)"
-              stroke="black"
-              dot={false}
-            />
-          </LineChart>
-        </ResponsiveContainer>
+    <div className="max-w-4xl mx-auto px-4">
+      {/* Tab Header */}
+      <div className="mb-4 flex border-b">
+        <button
+          onClick={() => setActiveTab('cumulative')}
+          className={`mr-4 pb-2 ${
+            activeTab === 'cumulative'
+              ? 'border-b-2 border-red-600 font-bold'
+              : 'text-neutral-600'
+          }`}
+        >
+          Cumulative % Change
+        </button>
+        <button
+          onClick={() => setActiveTab('rebased')}
+          className={`mr-4 pb-2 ${
+            activeTab === 'rebased'
+              ? 'border-b-2 border-red-600 font-bold'
+              : 'text-neutral-600'
+          }`}
+        >
+          Rebased to 100
+        </button>
+        <button
+          onClick={() => setActiveTab('yoy')}
+          className={`mr-4 pb-2 ${
+            activeTab === 'yoy'
+              ? 'border-b-2 border-red-600 font-bold'
+              : 'text-neutral-600'
+          }`}
+        >
+          Year over Year % Change
+        </button>
       </div>
 
-      {/* Right: Year-over-Year % chart */}
-      <div className="w-full h-[500px] border p-2">
-        <h2 className="mb-2 text-lg font-semibold">Year-over-Year % Change</h2>
+      {/* Chart Container */}
+      <div className="w-full h-[500px] p-2 border">
         <ResponsiveContainer width="100%" height="100%">
-          <LineChart data={yoyData}>
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="Date" />
-            <YAxis />
-            <Tooltip />
-            <Legend verticalAlign="top" align="left" />
-            <Line
-              type="monotone"
-              dataKey="YoYClose"
-              name="United Healthcare Stock Price"
-              stroke="red"
-              dot={false}
-            />
-            <Line
-              type="monotone"
-              dataKey="YoYIncome"
-              name="Median Family Income (U.S.)"
-              stroke="black"
-              dot={false}
-            />
-          </LineChart>
+          {activeTab === 'cumulative' && (
+            <LineChart data={cumData}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="Date" tickFormatter={(tick) => new Date(tick).getFullYear()} />
+              <YAxis />
+              <Tooltip />
+              <Legend verticalAlign="top" align="left" />
+              <Line type="monotone" dataKey="CumUNH" name="UNH" stroke="red" dot={false} />
+              <Line type="monotone" dataKey="CumCentene" name="Centene" stroke="blue" dot={false} />
+              <Line type="monotone" dataKey="CumCigna" name="Cigna" stroke="green" dot={false} />
+              <Line type="monotone" dataKey="CumAetna" name="Aetna" stroke="orange" dot={false} />
+              <Line type="monotone" dataKey="CumIncome" name="Median Income" stroke="black" dot={false} />
+            </LineChart>
+          )}
+          {activeTab === 'rebased' && (
+            <LineChart data={rebData}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="Date" tickFormatter={(tick) => new Date(tick).getFullYear()} />
+              <YAxis />
+              <Tooltip />
+              <Legend verticalAlign="top" align="left" />
+              <Line type="monotone" dataKey="RebUNH" name="UNH" stroke="red" dot={false} />
+              <Line type="monotone" dataKey="RebCentene" name="Centene" stroke="blue" dot={false} />
+              <Line type="monotone" dataKey="RebCigna" name="Cigna" stroke="green" dot={false} />
+              <Line type="monotone" dataKey="RebAetna" name="Aetna" stroke="orange" dot={false} />
+              <Line type="monotone" dataKey="RebIncome" name="Median Income" stroke="black" dot={false} />
+            </LineChart>
+          )}
+          {activeTab === 'yoy' && (
+            <LineChart data={yoyData}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="Date" /> {/* Year-over-Year data already uses year strings */}
+              <YAxis />
+              <Tooltip />
+              <Legend verticalAlign="top" align="left" />
+              <Line type="monotone" dataKey="YoYUNH" name="UNH" stroke="red" dot={false} />
+              <Line type="monotone" dataKey="YoYCentene" name="Centene" stroke="blue" dot={false} />
+              <Line type="monotone" dataKey="YoYCigna" name="Cigna" stroke="green" dot={false} />
+              <Line type="monotone" dataKey="YoYAetna" name="Aetna" stroke="orange" dot={false} />
+              <Line type="monotone" dataKey="YoYIncome" name="Median Income" stroke="black" dot={false} />
+            </LineChart>
+          )}
         </ResponsiveContainer>
       </div>
     </div>

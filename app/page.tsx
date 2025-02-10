@@ -1,5 +1,7 @@
 // app/page.tsx
+
 import { getProducts } from 'lib/shopify';
+import Image from 'next/image';
 import Link from 'next/link';
 import ChartSection from './ChartSection';
 
@@ -11,23 +13,14 @@ export default async function HomePage() {
   }
 
   return (
-    
     <main className="mx-auto max-w-7xl p-4">
-
-      {/* 2) Render the client-side chart section */}
+      {/* Chart Section */}
       <ChartSection />
 
-      <hr className="my-8" />
-      <Link
-      href="/Study-1"
-      className="mb-8 inline-block rounded-md bg-red-600 px-4 py-2 text-white hover:bg-red-700"
-    >
-      More Healthcare Insurance Data
-    </Link>
+      {/* Add spacing above "All Products" */}
+      <h2 className="mt-8 mb-6 text-2xl font-bold">All Products</h2>
 
-      {/* 3) Display products in a 3-column grid */}
-      <h2 className="mb-6 text-2xl font-bold">All Products</h2>
-      {/* <div className="grid grid-cols-3 gap-6">
+      <div className="grid grid-cols-3 gap-6">
         {products.map((product) => {
           const firstImage = product.images?.[0];
           return (
@@ -54,7 +47,7 @@ export default async function HomePage() {
             </Link>
           );
         })}
-      </div> */}
+      </div>
     </main>
   );
 }

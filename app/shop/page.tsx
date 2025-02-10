@@ -1,6 +1,8 @@
 // app/shop/page.tsx
 
 import { getCollectionProducts, getCollections } from 'lib/shopify';
+import Image from 'next/image';
+import Link from 'next/link';
 
 export default async function ShopPage() {
   // 1) Fetch all collections from Shopify
@@ -32,7 +34,7 @@ export default async function ShopPage() {
 
   return (
     <main className="mx-auto max-w-7xl p-4">
-      {/* <h1 className="mb-6 text-3xl font-bold">Shop by Category</h1>
+      <h1 className="mb-6 text-3xl font-bold">Shop by Category</h1>
 
       {collectionsData.map((coll) => (
         <section key={coll.handle} className="mb-10">
@@ -73,7 +75,7 @@ export default async function ShopPage() {
             )}
           </div>
         </section>
-      ))} */}
+      ))}
     </main>
   );
 }

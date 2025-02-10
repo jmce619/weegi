@@ -1,5 +1,7 @@
+// app/ChartSection.tsx
 'use client';
 
+import Link from 'next/link';
 import { useMemo } from 'react';
 import {
   CartesianGrid,
@@ -12,6 +14,7 @@ import {
   YAxis
 } from 'recharts';
 import combinedData from './data/combined_data.json';
+import LifeExpectancyChart from './LifeExpectancyChart';
 
 /** Parse YYYY-MM-DD string to Date */
 function parseDate(dateStr: string): Date {
@@ -38,10 +41,8 @@ function mergeAsOf(
   for (const day of unhSorted) {
     const dayTime = parseDate(day.Date).getTime();
 
-    // Explicitly check that the next element exists before accessing it.
     while (mfiIndex < mfiSorted.length - 1) {
       const nextMfi = mfiSorted[mfiIndex + 1];
-      // If nextMfi is defined and its date is less than or equal to the current day, then advance.
       if (nextMfi && parseDate(nextMfi.Date).getTime() <= dayTime) {
         mfiIndex++;
       } else {
@@ -49,9 +50,6 @@ function mergeAsOf(
       }
     }
 
-    // currentMfi will be defined because:
-    // - mfiSorted has at least one element (we check this earlier in the component),
-    // - and mfiIndex is kept in bounds.
     const currentMfi = mfiSorted[mfiIndex];
     merged.push({
       Date: day.Date,
@@ -64,7 +62,8 @@ function mergeAsOf(
 }
 
 /**
- * Cumulative % change from earliest date: ((val - firstVal)/firstVal)*100
+ * Compute the cumulative percentage change for both Close and Income values.
+ * Only when the median family income changes do we calculate a new cumulative data point.
  */
 function cumulativePercentChange(
   data: Array<{ Date: string; Close: number; Income: number }>
@@ -74,20 +73,29 @@ function cumulativePercentChange(
   const sorted = [...data].sort(
     (a, b) => parseDate(a.Date).getTime() - parseDate(b.Date).getTime()
   );
-  // Since data is not empty, sorted[0] exists.
   const firstClose = sorted[0]!.Close;
   const firstIncome = sorted[0]!.Income;
 
-  return sorted.map((row) => ({
-    Date: row.Date,
-    CumClose: ((row.Close - firstClose) / firstClose) * 100,
-    CumIncome: ((row.Income - firstIncome) / firstIncome) * 100
-  }));
+  // Start with the baseline record
+  const result = [{ Date: sorted[0].Date, CumClose: 0, CumIncome: 0 }];
+  let prevIncome = firstIncome;
+
+  // Only update cumulative values when income changes
+  for (let i = 1; i < sorted.length; i++) {
+    const row = sorted[i];
+    if (row.Income !== prevIncome) {
+      const cumIncome = ((row.Income - firstIncome) / firstIncome) * 100;
+      const cumClose = ((row.Close - firstClose) / firstClose) * 100;
+      result.push({ Date: row.Date, CumClose: cumClose, CumIncome: cumIncome });
+      prevIncome = row.Income;
+    }
+  }
+
+  return result;
 }
 
 /**
- * Year-over-year % change: groups daily data by year (using the last day for each year)
- * and calculates YoY change from the previous year.
+ * Compute the year-over-year percentage change for Close and Income values.
  */
 function yearOverYearChange(
   data: Array<{ Date: string; Close: number; Income: number }>
@@ -99,7 +107,6 @@ function yearOverYearChange(
   );
   const yearMap = new Map<number, { Date: string; Close: number; Income: number }>();
 
-  // Use the last day in the sorted order for each year.
   for (const row of sorted) {
     const y = parseDate(row.Date).getFullYear();
     yearMap.set(y, row);
@@ -136,72 +143,108 @@ export default function ChartSection() {
     return <p>No chart data available</p>;
   }
 
-  // 2) Merge daily UNH with monthly MFI data.
+  // 2) Merge daily UNH with monthly MFI data
   const mergedDaily = useMemo(() => mergeAsOf(unhData, mfiData), [unhData, mfiData]);
   if (!mergedDaily.length) {
     return <p>No merged data found</p>;
   }
 
-  // 3) Compute cumulative and year-over-year data transformations.
+  // 3) Compute transformations
   const cumData = useMemo(() => cumulativePercentChange(mergedDaily), [mergedDaily]);
   const yoyData = useMemo(() => yearOverYearChange(mergedDaily), [mergedDaily]);
 
   return (
-    <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-      {/* Left: Cumulative % chart */}
-      <div className="w-full h-[500px] border p-2">
-        <h2 className="mb-2 text-lg font-semibold">Cumulative % Change</h2>
-        <ResponsiveContainer width="100%" height="100%">
-          <LineChart data={cumData}>
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="Date" />
-            <YAxis />
-            <Tooltip />
-            <Legend verticalAlign="top" align="left" />
-            <Line
-              type="monotone"
-              dataKey="CumClose"
-              name="United Healthcare Stock Price"
-              stroke="red"
-              dot={false}
-            />
-            <Line
-              type="monotone"
-              dataKey="CumIncome"
-              name="Median Family Income (U.S.)"
-              stroke="black"
-              dot={false}
-            />
-          </LineChart>
-        </ResponsiveContainer>
+    <div className="grid grid-rows-2 grid-cols-2 gap-6">
+      {/* Top-left: Cumulative % Change chart */}
+      <div className="col-span-1">
+        <div className="w-full h-[500px] p-2">
+          <h2 className="mb-2 text-lg font-semibold">Cumulative % Change</h2>
+          <ResponsiveContainer width="100%" height="100%">
+            <LineChart data={cumData}>
+              <CartesianGrid strokeDasharray="3 3" />
+              {/* Format x-axis ticks to show only the year */}
+              <XAxis dataKey="Date" tickFormatter={(tick) => new Date(tick).getFullYear()} />
+              <YAxis />
+              <Tooltip />
+              <Legend verticalAlign="top" align="left" />
+              <Line
+                type="monotone"
+                dataKey="CumClose"
+                name="United Healthcare Stock Price"
+                stroke="red"
+                dot={false}
+              />
+              <Line
+                type="monotone"
+                dataKey="CumIncome"
+                name="Median Family Income (U.S.)"
+                stroke="black"
+                dot={false}
+              />
+            </LineChart>
+          </ResponsiveContainer>
+        </div>
       </div>
 
-      {/* Right: Year-over-Year % chart */}
-      <div className="w-full h-[500px] border p-2">
-        <h2 className="mb-2 text-lg font-semibold">Year-over-Year % Change</h2>
-        <ResponsiveContainer width="100%" height="100%">
-          <LineChart data={yoyData}>
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="Date" />
-            <YAxis />
-            <Tooltip />
-            <Legend verticalAlign="top" align="left" />
-            <Line
-              type="monotone"
-              dataKey="YoYClose"
-              name="United Healthcare Stock Price"
-              stroke="red"
-              dot={false}
-            />
-            <Line
-              type="monotone"
-              dataKey="YoYIncome"
-              name="Median Family Income (U.S.)"
-              stroke="black"
-              dot={false}
-            />
-          </LineChart>
-        </ResponsiveContainer>
+      {/* Top-right: Year-over-Year % Change chart */}
+      <div className="col-span-1">
+        <div className="w-full h-[500px] p-2">
+          <h2 className="mb-2 text-lg font-semibold">Year-over-Year % Change</h2>
+          <ResponsiveContainer width="100%" height="100%">
+            <LineChart data={yoyData}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="Date" />
+              <YAxis />
+              <Tooltip />
+              <Legend verticalAlign="top" align="left" />
+              <Line
+                type="monotone"
+                dataKey="YoYClose"
+                name="United Healthcare Stock Price"
+                stroke="red"
+                dot={false}
+              />
+              <Line
+                type="monotone"
+                dataKey="YoYIncome"
+                name="Median Family Income (U.S.)"
+                stroke="black"
+                dot={false}
+              />
+            </LineChart>
+          </ResponsiveContainer>
+        </div>
+      </div>
+
+      {/* Bottom-left: Life Expectancy Chart */}
+      <div className="col-span-1">
+        <div className="w-full h-[500px] p-2">
+          <LifeExpectancyChart />
+        </div>
+      </div>
+
+      {/* Bottom-right: Info Card with Background Image */}
+      <div
+        className="col-span-1 flex items-center justify-center p-0 rounded shadow-sm"
+        style={{
+          backgroundImage: "url('/images/your-background.png')",
+          backgroundSize: 'cover',
+          backgroundPosition: 'center'
+        }}
+      >
+        {/* Use an overlay div for contrast */}
+        <div className="w-full h-full flex flex-col items-center justify-center bg-white bg-opacity-50 p-4 rounded">
+          <h3 className="text-xl font-semibold text-black mb-2">More Data</h3>
+          <p className="mb-4 text-center text-black">
+            Dive deeper into additional healthcare insurance data and charts.
+          </p>
+          <Link
+            href="/Study-1"
+            className="inline-block rounded-md bg-red-600 px-4 py-2 text-white hover:bg-red-700"
+          >
+            Explore
+          </Link>
+        </div>
       </div>
     </div>
   );

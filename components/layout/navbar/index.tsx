@@ -1,9 +1,9 @@
 'use client';
 
+import CartModal from 'components/cart/modal'; // Adjust this path if needed
 import Image from 'next/image';
 import Link from 'next/link';
-// Remove or comment out the custom CartModal import if not needed
-// import CartModal from 'components/cart/modal';
+import { useState } from 'react';
 
 /** Example static menu items. Replace with your real data if you wish. */
 const menu = [
@@ -14,18 +14,19 @@ const menu = [
 ];
 
 export function Navbar() {
-  // If you’re not using your custom cart modal, you can remove these lines:
-  // const [isCartOpen, setIsCartOpen] = useState(false);
-  // const openCart = () => setIsCartOpen(true);
-  // const closeCart = () => setIsCartOpen(false);
+  // Local state to open/close the cart modal
+  const [isCartOpen, setIsCartOpen] = useState(false);
+
+  const openCart = () => setIsCartOpen(true);
+  const closeCart = () => setIsCartOpen(false);
 
   return (
     <>
-      <nav className="flex items-center justify-between p-4 shadow">
+      <nav className="relative flex items-center justify-between p-4 shadow">
         {/* LEFT: Logo */}
         <Link href="/" className="shrink-0">
           <Image
-            src="/weegi_full_logo.png"
+            src="/weegi_full_logo.png" // Ensure this file is in /public
             alt="My Brand Logo"
             width={120}
             height={40}
@@ -33,8 +34,17 @@ export function Navbar() {
           />
         </Link>
 
-        {/* RIGHT: Menu Items */}
+        {/* CENTER: Positioned text in red */}
+        <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
+          <p className="text-sm font-bold text-red-600">
+            100% Of Profits Going To HCFA, Families USA, And Others.
+          </p>
+        </div>
+
+
+        {/* RIGHT: Menu Items + Cart Icon Button */}
         <div className="flex items-center gap-6">
+          {/* Menu Items */}
           <ul className="hidden items-center gap-6 md:flex">
             {menu.map((item) => (
               <li key={item.title}>
@@ -45,8 +55,8 @@ export function Navbar() {
             ))}
           </ul>
 
-          {/* If you no longer need a custom cart modal button, you can remove or repurpose this button */}
-          <button aria-label="Open cart" className="relative">
+          {/* Cart Button */}
+          <button onClick={openCart} aria-label="Open cart" className="relative">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
@@ -65,8 +75,8 @@ export function Navbar() {
         </div>
       </nav>
 
-      {/* Remove the custom CartModal if you are not using it */}
-      {/* {isCartOpen && <CartModal onClose={closeCart} />} */}
+      {/* Conditionally render the CartModal when isCartOpen is true */}
+      {isCartOpen && <CartModal onClose={closeCart} />}
     </>
   );
 }
