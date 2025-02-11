@@ -1,11 +1,11 @@
 'use client';
 
-import CartModal from 'components/cart/modal'; // Make sure the path is correct
+import CartModal from 'components/cart/modal';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useState } from 'react';
 
-/** Example static menu items. Replace with your real data if you wish. */
+/** Example static menu items. */
 const menu = [
   { title: 'Shop', path: '/shop' },
   { title: 'Healthcare Insurance Data', path: '/Study-1' },
@@ -14,9 +14,7 @@ const menu = [
 ];
 
 export function Navbar() {
-  // Local state to open/close the cart modal
   const [isCartOpen, setIsCartOpen] = useState(false);
-
   const openCart = () => setIsCartOpen(true);
   const closeCart = () => setIsCartOpen(false);
 
@@ -26,7 +24,7 @@ export function Navbar() {
         {/* LEFT: Logo */}
         <Link href="/" className="shrink-0">
           <Image
-            src="/weegi_full_logo.png" // Ensure this file is in /public
+            src="/weegi_full_logo.png"
             alt="My Brand Logo"
             width={120}
             height={40}
@@ -43,14 +41,10 @@ export function Navbar() {
 
         {/* RIGHT: Menu Items + Cart Icon Button */}
         <div className="flex items-center gap-6">
-          {/* Menu Items */}
           <ul className="hidden items-center gap-6 md:flex">
             {menu.map((item) => (
               <li key={item.title}>
-                <Link
-                  href={item.path}
-                  className="text-sm text-neutral-600 hover:text-black"
-                >
+                <Link href={item.path} className="text-sm text-neutral-600 hover:text-black">
                   {item.title}
                 </Link>
               </li>
@@ -77,7 +71,7 @@ export function Navbar() {
         </div>
       </nav>
 
-      {/* Conditionally render the CartModal when isCartOpen is true */}
+      {/* Render CartModal conditionally */}
       {isCartOpen && <CartModal onClose={closeCart} />}
     </>
   );
