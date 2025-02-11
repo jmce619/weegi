@@ -1,6 +1,6 @@
 'use client';
 
-import CartModal from 'components/cart/modal'; // Adjust this path if needed
+import CartModal from 'components/cart/modal'; // Make sure the path is correct
 import Image from 'next/image';
 import Link from 'next/link';
 import { useState } from 'react';
@@ -41,14 +41,16 @@ export function Navbar() {
           </p>
         </div>
 
-
         {/* RIGHT: Menu Items + Cart Icon Button */}
         <div className="flex items-center gap-6">
           {/* Menu Items */}
           <ul className="hidden items-center gap-6 md:flex">
             {menu.map((item) => (
               <li key={item.title}>
-                <Link href={item.path} className="text-sm text-neutral-600 hover:text-black">
+                <Link
+                  href={item.path}
+                  className="text-sm text-neutral-600 hover:text-black"
+                >
                   {item.title}
                 </Link>
               </li>
