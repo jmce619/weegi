@@ -76,13 +76,13 @@ function cumulativePercentChange(
   const firstClose = sorted[0]!.Close;
   const firstIncome = sorted[0]!.Income;
 
-  // Start with the baseline record (using non-null assertion for sorted[0])
+  // Start with the baseline record (asserting that sorted[0] is defined)
   const result = [{ Date: sorted[0]!.Date, CumClose: 0, CumIncome: 0 }];
   let prevIncome = firstIncome;
 
   // Only update cumulative values when income changes
   for (let i = 1; i < sorted.length; i++) {
-    const row = sorted[i]!; // assert row is not undefined
+    const row = sorted[i]!; // assert that row is not undefined
     if (row.Income !== prevIncome) {
       const cumIncome = ((row.Income - firstIncome) / firstIncome) * 100;
       const cumClose = ((row.Close - firstClose) / firstClose) * 100;
@@ -162,8 +162,11 @@ export default function ChartSection() {
           <ResponsiveContainer width="100%" height="100%">
             <LineChart data={cumData}>
               <CartesianGrid strokeDasharray="3 3" />
-              {/* Format x-axis ticks to show only the year */}
-              <XAxis dataKey="Date" tickFormatter={(tick) => new Date(tick).getFullYear()} />
+              {/* Format x-axis ticks to show only the year as a string */}
+              <XAxis
+                dataKey="Date"
+                tickFormatter={(tick) => new Date(tick).getFullYear().toString()}
+              />
               <YAxis />
               <Tooltip />
               <Legend verticalAlign="top" align="left" />
