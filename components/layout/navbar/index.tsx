@@ -1,11 +1,10 @@
 'use client';
 
-import CartModal from 'components/cart/modal';
+import CartModal from 'components/cart/modal'; // Ensure this path is correct and that the file is .tsx
 import Image from 'next/image';
 import Link from 'next/link';
 import { useState } from 'react';
 
-/** Example static menu items. */
 const menu = [
   { title: 'Shop', path: '/shop' },
   { title: 'Healthcare Insurance Data', path: '/Study-1' },
@@ -44,7 +43,10 @@ export function Navbar() {
           <ul className="hidden items-center gap-6 md:flex">
             {menu.map((item) => (
               <li key={item.title}>
-                <Link href={item.path} className="text-sm text-neutral-600 hover:text-black">
+                <Link
+                  href={item.path}
+                  className="text-sm text-neutral-600 hover:text-black"
+                >
                   {item.title}
                 </Link>
               </li>
@@ -71,7 +73,7 @@ export function Navbar() {
         </div>
       </nav>
 
-      {/* Render CartModal conditionally */}
+      {/* Render the CartModal conditionally */}
       {isCartOpen && <CartModal onClose={closeCart} />}
     </>
   );
