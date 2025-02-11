@@ -1,6 +1,7 @@
+// components/layout/navbar/index.tsx
 'use client';
 
-import CartModal from 'components/cart/modal'; // Ensure this path is correct and that the file is .tsx
+import CartModal from 'components/cart/modal'; // Ensure the path is correct and that the file is .tsx
 import Image from 'next/image';
 import Link from 'next/link';
 import { useState } from 'react';
@@ -73,7 +74,7 @@ export function Navbar() {
         </div>
       </nav>
 
-      {/* Render the CartModal conditionally */}
+      {/* Render CartModal conditionally */}
       {isCartOpen && <CartModal onClose={closeCart} />}
     </>
   );
