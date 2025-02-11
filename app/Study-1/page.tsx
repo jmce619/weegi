@@ -53,7 +53,8 @@ function mergeData(
     merged.push({
       Date: daily.Date,
       Close: daily.Close,
-      Income: sortedIncome[incomeIndex] ? sortedIncome[incomeIndex].Income : null
+      // Assert that sortedIncome[incomeIndex] is defined.
+      Income: sortedIncome[incomeIndex]!.Income
     });
   }
   return merged;
@@ -78,7 +79,7 @@ function cumulativePercentChange(
 
   // Only update cumulative values when Income changes
   for (let i = 1; i < sorted.length; i++) {
-    const row = sorted[i]!; // Assert that row is defined.
+    const row = sorted[i]!; // Assert row is defined.
     if (row.Income !== prevIncome && row.Income !== null && firstIncome !== null) {
       const cumIncome = ((row.Income - firstIncome) / firstIncome) * 100;
       const cumClose = ((row.Close - firstClose) / firstClose) * 100;
@@ -86,7 +87,6 @@ function cumulativePercentChange(
       prevIncome = row.Income;
     }
   }
-
   return result;
 }
 
