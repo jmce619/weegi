@@ -14,12 +14,15 @@ import {
 } from 'recharts';
 import combinedData from '../data/combined_data.json';
 
+/** Parse a date string (YYYY-MM-DD) to a Date object */
 function parseDate(dateStr: string): Date {
   return new Date(dateStr + 'T00:00:00');
 }
 
-// In this example we merge the daily UNH stock data with the monthly median_income data.
-// We assume that the income data is reported once per month.
+/**
+ * Merge daily stock data with monthly income data.
+ * We assume dailyData has one record per day, and incomeData is reported monthly.
+ */
 function mergeData(
   dailyData: { Date: string; Close: number }[],
   incomeData: { Date: string; Income: number }[]
@@ -35,11 +38,11 @@ function mergeData(
   const merged = [];
 
   for (let i = 0; i < sortedDaily.length; i++) {
-    const daily = sortedDaily[i];
+    // Assert that the daily element is defined.
+    const daily = sortedDaily[i]!;
     const currentDate = parseDate(daily.Date);
 
-    // As long as there is a next income record and its date is <= current date,
-    // move forward.
+    // As long as there is a next income record and its date is <= currentDate, move forward.
     while (
       incomeIndex < sortedIncome.length - 1 &&
       parseDate(sortedIncome[incomeIndex + 1]!.Date).getTime() <= currentDate.getTime()
@@ -56,6 +59,10 @@ function mergeData(
   return merged;
 }
 
+/**
+ * Compute the cumulative percentage change for Close and Income.
+ * Only update when the Income changes.
+ */
 function cumulativePercentChange(
   data: Array<{ Date: string; Close: number; Income: number | null }>
 ) {
@@ -69,9 +76,9 @@ function cumulativePercentChange(
   const result = [{ Date: sorted[0]!.Date, CumClose: 0, CumIncome: 0 }];
   let prevIncome = firstIncome;
 
-  // Only update cumulative values when the Income changes
+  // Only update cumulative values when Income changes
   for (let i = 1; i < sorted.length; i++) {
-    const row = sorted[i]!;
+    const row = sorted[i]!; // Assert that row is defined.
     if (row.Income !== prevIncome && row.Income !== null && firstIncome !== null) {
       const cumIncome = ((row.Income - firstIncome) / firstIncome) * 100;
       const cumClose = ((row.Close - firstClose) / firstClose) * 100;
@@ -79,9 +86,13 @@ function cumulativePercentChange(
       prevIncome = row.Income;
     }
   }
+
   return result;
 }
 
+/**
+ * Compute year-over-year percentage change for Close and Income.
+ */
 function yearOverYearChange(
   data: Array<{ Date: string; Close: number; Income: number | null }>
 ) {
@@ -129,7 +140,6 @@ export default function Study1Page() {
     return <p>No chart data available</p>;
   }
 
-  // Merge the daily stock data with the monthly income data.
   const mergedData = useMemo(() => mergeData(unhData, incomeData), [unhData, incomeData]);
   if (!mergedData.length) {
     return <p>No merged data found</p>;
