@@ -227,7 +227,7 @@ export default function ChartSection() {
       <div
         className="col-span-1 flex items-center justify-center p-0 rounded shadow-sm"
         style={{
-          backgroundImage: "url('/images/your-background.jpg')",
+          backgroundImage: "url('/images/your-background.png')",
           backgroundSize: 'cover',
           backgroundPosition: 'center'
         }}
