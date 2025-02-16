@@ -167,11 +167,12 @@ function yearOverYearChange(
     yearly.set(year, record);
   });
 
-  const years = Array.from(yearly.keys()).sort();
+  // Sort years numerically
+  const years = Array.from(yearly.keys()).sort((a, b) => a - b);
   const results = [];
   for (let i = 1; i < years.length; i++) {
-    const prevYear = years[i - 1];
-    const currYear = years[i];
+    const prevYear = years[i - 1]!;
+    const currYear = years[i]!;
     const prevRecord = yearly.get(prevYear)!;
     const currRecord = yearly.get(currYear)!;
     results.push({
