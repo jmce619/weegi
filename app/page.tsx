@@ -27,7 +27,7 @@ export default async function HomePage() {
             <Link
               key={product.handle}
               href={`/product/${product.handle}`}
-              className="block overflow-hidden rounded border p-4 shadow-sm transition hover:shadow-md"
+              className="block overflow-hidden rounded p-4 transition"
             >
               <div className="relative mb-3 aspect-square w-full">
                 {firstImage?.url ? (
@@ -44,6 +44,10 @@ export default async function HomePage() {
                 )}
               </div>
               <h3 className="mb-1 font-medium">{product.title}</h3>
+              <p className="text-sm font-semibold">
+                {product.priceRange?.minVariantPrice?.amount}{' '}
+                {product.priceRange?.minVariantPrice?.currencyCode}
+              </p>
             </Link>
           );
         })}

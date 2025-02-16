@@ -17,18 +17,24 @@ export default function ProductsGrid({ products }: ProductsGridProps) {
         <Link
           key={product.id}
           href={`/product/${product.handle}`}
-          className="block p-4 border hover:shadow transition"
+          className="block p-4 hover:shadow transition" // Removed the 'border' class
         >
           <img
             src={product.featuredImage?.url}
             alt={product.title}
             className="mb-2 h-48 w-full object-cover"
           />
-          <h2>{product.title}</h2>
-          <p>
-            {product.priceRange?.minVariantPrice?.amount}{' '}
-            {product.priceRange?.minVariantPrice?.currencyCode}
-          </p>
+          <h2 className="mt-2 text-lg font-semibold">{product.title}</h2>
+          {product.priceRange?.minVariantPrice?.amount ? (
+            <p className="mt-1 text-base font-medium text-gray-700">
+              {Number(product.priceRange.minVariantPrice.amount).toLocaleString(undefined, {
+                style: 'currency',
+                currency: product.priceRange.minVariantPrice.currencyCode,
+              })}
+            </p>
+          ) : (
+            <p className="mt-1 text-base font-medium text-gray-700">Price not available</p>
+          )}
         </Link>
       ))}
     </div>

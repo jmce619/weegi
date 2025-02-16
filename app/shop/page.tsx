@@ -34,7 +34,6 @@ export default async function ShopPage() {
 
   return (
     <main className="mx-auto max-w-7xl p-4">
-      <h1 className="mb-6 text-3xl font-bold">Shop by Category</h1>
 
       {collectionsData.map((coll) => (
         <section key={coll.handle} className="mb-10">
@@ -47,10 +46,10 @@ export default async function ShopPage() {
               coll.products.map((product) => {
                 const firstImage = product.images?.[0];
                 return (
-                  <Link
+                    <Link
                     key={product.handle}
                     href={`/product/${product.handle}`}
-                    className="block overflow-hidden rounded border p-4 shadow-sm transition hover:shadow-md"
+                    className="block overflow-hidden rounded p-4 transition"
                   >
                     <div className="relative mb-3 aspect-square w-full">
                       {firstImage?.url ? (
@@ -67,7 +66,18 @@ export default async function ShopPage() {
                       )}
                     </div>
                     <h3 className="mb-1 font-medium">{product.title}</h3>
+                    {product.priceRange?.minVariantPrice?.amount ? (
+                      <p className="text-sm font-medium text-gray-700">
+                        {Number(product.priceRange.minVariantPrice.amount).toLocaleString(undefined, {
+                          style: 'currency',
+                          currency: product.priceRange.minVariantPrice.currencyCode,
+                        })}
+                      </p>
+                    ) : (
+                      <p className="text-sm font-medium text-gray-700">Price not available</p>
+                    )}
                   </Link>
+                  
                 );
               })
             ) : (
