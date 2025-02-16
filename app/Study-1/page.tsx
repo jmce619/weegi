@@ -34,18 +34,14 @@ function mergeStockAndIncomeData() {
   const aetnaData = combinedData.aetna_data || [];
   const incomeData = combinedData.median_income || [];
 
-  // If there's no income data, return an empty array.
-  if (incomeData.length === 0) {
-    return [];
-  }
-
   // Ensure income data is sorted (ascending by date)
   const sortedIncome = [...incomeData].sort(
     (a, b) => parseDate(a.Date).getTime() - parseDate(b.Date).getTime()
   );
 
-  // Use the earliest income value as a fallback
-  const baselineIncome = sortedIncome[0].Income;
+  // Use the earliest income value as a fallback.
+  // (Non-null assertion because we expect at least one income record.)
+  const baselineIncome = sortedIncome[0]!.Income;
 
   let incomeIndex = 0;
   const merged = unhData.map((record, i) => {
@@ -63,7 +59,7 @@ function mergeStockAndIncomeData() {
       Centene: centeneData[i] ? centeneData[i].Close : null,
       Cigna: cignaData[i] ? cignaData[i].Close : null,
       Aetna: aetnaData[i] ? aetnaData[i].Close : null,
-      // If no income is found, default to baselineIncome (a number)
+      // Always use a number (fallback to baselineIncome if undefined)
       Income: sortedIncome[incomeIndex]?.Income ?? baselineIncome
     };
   });
@@ -217,89 +213,69 @@ export default function StudyOnePage() {
   const rebData = useMemo(() => rebaseTo100(mergedData), [mergedData]);
   const yoyData = useMemo(() => yearOverYearChange(mergedData), [mergedData]);
 
-  return (
-    <div className="max-w-4xl mx-auto px-4">
-      {/* Tab Header */}
-      <div className="mb-4 flex border-b">
-        <button
-          onClick={() => setActiveTab('cumulative')}
-          className={`mr-4 pb-2 ${
-            activeTab === 'cumulative'
-              ? 'border-b-2 border-red-600 font-bold'
-              : 'text-neutral-600'
-          }`}
-        >
-          Cumulative % Change
-        </button>
-        <button
-          onClick={() => setActiveTab('rebased')}
-          className={`mr-4 pb-2 ${
-            activeTab === 'rebased'
-              ? 'border-b-2 border-red-600 font-bold'
-              : 'text-neutral-600'
-          }`}
-        >
-          Rebased to 100
-        </button>
-        <button
-          onClick={() => setActiveTab('yoy')}
-          className={`mr-4 pb-2 ${
-            activeTab === 'yoy'
-              ? 'border-b-2 border-red-600 font-bold'
-              : 'text-neutral-600'
-          }`}
-        >
-          Year over Year % Change
-        </button>
-      </div>
+  // Determine which chart to render based on the active tab.
+  // Determine which chart to render based on the active tab.
+let chartContent: React.ReactElement = <></>; // Default fallback
 
-      {/* Chart Container */}
-      <div className="w-full h-[500px] p-2 border">
-        <ResponsiveContainer width="100%" height="100%">
-          {activeTab === 'cumulative' && (
-            <LineChart data={cumData}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="Date" tickFormatter={(tick) => new Date(tick).getFullYear()} />
-              <YAxis />
-              <Tooltip />
-              <Legend verticalAlign="top" align="left" />
-              <Line type="monotone" dataKey="CumUNH" name="UNH" stroke="red" dot={false} />
-              <Line type="monotone" dataKey="CumCentene" name="Centene" stroke="blue" dot={false} />
-              <Line type="monotone" dataKey="CumCigna" name="Cigna" stroke="green" dot={false} />
-              <Line type="monotone" dataKey="CumAetna" name="Aetna" stroke="orange" dot={false} />
-              <Line type="monotone" dataKey="CumIncome" name="Median Income" stroke="black" dot={false} />
-            </LineChart>
-          )}
-          {activeTab === 'rebased' && (
-            <LineChart data={rebData}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="Date" tickFormatter={(tick) => new Date(tick).getFullYear()} />
-              <YAxis />
-              <Tooltip />
-              <Legend verticalAlign="top" align="left" />
-              <Line type="monotone" dataKey="RebUNH" name="UNH" stroke="red" dot={false} />
-              <Line type="monotone" dataKey="RebCentene" name="Centene" stroke="blue" dot={false} />
-              <Line type="monotone" dataKey="RebCigna" name="Cigna" stroke="green" dot={false} />
-              <Line type="monotone" dataKey="RebAetna" name="Aetna" stroke="orange" dot={false} />
-              <Line type="monotone" dataKey="RebIncome" name="Median Income" stroke="black" dot={false} />
-            </LineChart>
-          )}
-          {activeTab === 'yoy' && (
-            <LineChart data={yoyData}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="Date" /> {/* Year-over-Year data already uses year strings */}
-              <YAxis />
-              <Tooltip />
-              <Legend verticalAlign="top" align="left" />
-              <Line type="monotone" dataKey="YoYUNH" name="UNH" stroke="red" dot={false} />
-              <Line type="monotone" dataKey="YoYCentene" name="Centene" stroke="blue" dot={false} />
-              <Line type="monotone" dataKey="YoYCigna" name="Cigna" stroke="green" dot={false} />
-              <Line type="monotone" dataKey="YoYAetna" name="Aetna" stroke="orange" dot={false} />
-              <Line type="monotone" dataKey="YoYIncome" name="Median Income" stroke="black" dot={false} />
-            </LineChart>
-          )}
-        </ResponsiveContainer>
-      </div>
-    </div>
+if (activeTab === 'cumulative') {
+  chartContent = (
+    <LineChart data={cumData}>
+      <CartesianGrid strokeDasharray="3 3" />
+      <XAxis
+        dataKey="Date"
+        tickFormatter={(tick) => new Date(tick).getFullYear().toString()}
+      />
+      <YAxis />
+      <Tooltip />
+      <Legend verticalAlign="top" align="left" />
+      <Line type="monotone" dataKey="CumUNH" name="UNH" stroke="red" dot={false} />
+      <Line type="monotone" dataKey="CumCentene" name="Centene" stroke="blue" dot={false} />
+      <Line type="monotone" dataKey="CumCigna" name="Cigna" stroke="green" dot={false} />
+      <Line type="monotone" dataKey="CumAetna" name="Aetna" stroke="orange" dot={false} />
+      <Line type="monotone" dataKey="CumIncome" name="Median Income" stroke="black" dot={false} />
+    </LineChart>
   );
+} else if (activeTab === 'rebased') {
+  chartContent = (
+    <LineChart data={rebData}>
+      <CartesianGrid strokeDasharray="3 3" />
+      <XAxis
+        dataKey="Date"
+        tickFormatter={(tick) => new Date(tick).getFullYear().toString()}
+      />
+      <YAxis />
+      <Tooltip />
+      <Legend verticalAlign="top" align="left" />
+      <Line type="monotone" dataKey="RebUNH" name="UNH" stroke="red" dot={false} />
+      <Line type="monotone" dataKey="RebCentene" name="Centene" stroke="blue" dot={false} />
+      <Line type="monotone" dataKey="RebCigna" name="Cigna" stroke="green" dot={false} />
+      <Line type="monotone" dataKey="RebAetna" name="Aetna" stroke="orange" dot={false} />
+      <Line type="monotone" dataKey="RebIncome" name="Median Income" stroke="black" dot={false} />
+    </LineChart>
+  );
+} else if (activeTab === 'yoy') {
+  chartContent = (
+    <LineChart data={yoyData}>
+      <CartesianGrid strokeDasharray="3 3" />
+      <XAxis dataKey="Date" />
+      <YAxis />
+      <Tooltip />
+      <Legend verticalAlign="top" align="left" />
+      <Line type="monotone" dataKey="YoYUNH" name="UNH" stroke="red" dot={false} />
+      <Line type="monotone" dataKey="YoYCentene" name="Centene" stroke="blue" dot={false} />
+      <Line type="monotone" dataKey="YoYCigna" name="Cigna" stroke="green" dot={false} />
+      <Line type="monotone" dataKey="YoYAetna" name="Aetna" stroke="orange" dot={false} />
+      <Line type="monotone" dataKey="YoYIncome" name="Median Income" stroke="black" dot={false} />
+    </LineChart>
+  );
+}
+
+return (
+  <div className="w-full h-[500px] p-2 border">
+    <ResponsiveContainer width="100%" height="100%">
+      {chartContent}
+    </ResponsiveContainer>
+  </div>
+);
+
 }
