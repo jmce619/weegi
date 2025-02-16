@@ -34,10 +34,18 @@ function mergeStockAndIncomeData() {
   const aetnaData = combinedData.aetna_data || [];
   const incomeData = combinedData.median_income || [];
 
-  // Ensure income data is sorted (ascending)
+  // If there's no income data, return an empty array.
+  if (incomeData.length === 0) {
+    return [];
+  }
+
+  // Ensure income data is sorted (ascending by date)
   const sortedIncome = [...incomeData].sort(
     (a, b) => parseDate(a.Date).getTime() - parseDate(b.Date).getTime()
   );
+
+  // Use the earliest income value as a fallback
+  const baselineIncome = sortedIncome[0].Income;
 
   let incomeIndex = 0;
   const merged = unhData.map((record, i) => {
@@ -55,7 +63,8 @@ function mergeStockAndIncomeData() {
       Centene: centeneData[i] ? centeneData[i].Close : null,
       Cigna: cignaData[i] ? cignaData[i].Close : null,
       Aetna: aetnaData[i] ? aetnaData[i].Close : null,
-      Income: sortedIncome[incomeIndex]?.Income ?? null
+      // If no income is found, default to baselineIncome (a number)
+      Income: sortedIncome[incomeIndex]?.Income ?? baselineIncome
     };
   });
   return merged;
