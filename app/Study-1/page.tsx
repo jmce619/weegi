@@ -45,7 +45,7 @@ function mergeStockAndIncomeData() {
     // Advance incomeIndex if the next income record's date is not later than the current date.
     while (
       incomeIndex < sortedIncome.length - 1 &&
-      parseDate(sortedIncome[incomeIndex + 1].Date).getTime() <= currentDate.getTime()
+      parseDate(sortedIncome[incomeIndex + 1]!.Date).getTime() <= currentDate.getTime()
     ) {
       incomeIndex++;
     }
