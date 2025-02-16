@@ -1,3 +1,4 @@
+// app/components/cart/modal.tsx
 'use client';
 
 import { Dialog, Transition } from '@headlessui/react';
@@ -17,16 +18,24 @@ import { DeleteItemButton } from './delete-item-button';
 import { EditItemQuantityButton } from './edit-item-quantity-button';
 import OpenCart from './open-cart';
 
-type MerchandiseSearchParams = {
-  [key: string]: string;
-};
+// Define a prop type that accepts an optional onClose function.
+interface CartModalProps {
+  onClose?: () => void;
+}
 
-export default function CartModal() {
+export default function CartModal({ onClose }: CartModalProps) {
   const { cart, updateCartItem } = useCart();
-  const [isOpen, setIsOpen] = useState(false);
+  // We'll start with the modal open if it’s rendered by the parent.
+  const [isOpen, setIsOpen] = useState(true);
   const quantityRef = useRef(cart?.totalQuantity);
-  const openCart = () => setIsOpen(true);
-  const closeCart = () => setIsOpen(false);
+
+  // Update the internal close function to call the passed onClose prop, if provided.
+  const closeCart = () => {
+    setIsOpen(false);
+    if (onClose) {
+      onClose();
+    }
+  };
 
   useEffect(() => {
     if (!cart) {
@@ -45,11 +54,11 @@ export default function CartModal() {
       }
       quantityRef.current = cart?.totalQuantity;
     }
-  }, [isOpen, cart?.totalQuantity, quantityRef]);
+  }, [isOpen, cart?.totalQuantity]);
 
   return (
     <>
-      <button aria-label="Open cart" onClick={openCart}>
+      <button aria-label="Open cart" onClick={() => setIsOpen(true)}>
         <OpenCart quantity={cart?.totalQuantity} />
       </button>
       <Transition show={isOpen}>
@@ -81,33 +90,33 @@ export default function CartModal() {
                   <CloseCart />
                 </button>
               </div>
-
               {!cart || cart.lines.length === 0 ? (
                 <div className="mt-20 flex w-full flex-col items-center justify-center overflow-hidden">
                   <ShoppingCartIcon className="h-16" />
-                  <p className="mt-6 text-center text-2xl font-bold">Your cart is empty.</p>
+                  <p className="mt-6 text-center text-2xl font-bold">
+                    Your cart is empty.
+                  </p>
                 </div>
               ) : (
                 <div className="flex h-full flex-col justify-between overflow-hidden p-1">
                   <ul className="flex-grow overflow-auto py-4">
                     {cart.lines
                       .sort((a, b) =>
-                        a.merchandise.product.title.localeCompare(b.merchandise.product.title)
+                        a.merchandise.product.title.localeCompare(
+                          b.merchandise.product.title
+                        )
                       )
                       .map((item, i) => {
-                        const merchandiseSearchParams = {} as MerchandiseSearchParams;
-
+                        const merchandiseSearchParams = {} as Record<string, string>;
                         item.merchandise.selectedOptions.forEach(({ name, value }) => {
                           if (value !== DEFAULT_OPTION) {
                             merchandiseSearchParams[name.toLowerCase()] = value;
                           }
                         });
-
                         const merchandiseUrl = createUrl(
                           `/product/${item.merchandise.product.handle}`,
                           new URLSearchParams(merchandiseSearchParams)
                         );
-
                         return (
                           <li
                             key={i}
@@ -118,7 +127,7 @@ export default function CartModal() {
                                 <DeleteItemButton item={item} optimisticUpdate={updateCartItem} />
                               </div>
                               <div className="flex flex-row">
-                                <div className="relative h-16 w-16 overflow-hidden rounded-md border border-neutral-300 bg-neutral-300 dark:border-neutral-700 dark:bg-neutral-900 dark:hover:bg-neutral-800">
+                                <div className="relative h-16 w-16 overflow-hidden rounded-md border border-neutral-300 bg-neutral-300 dark:border-neutral-700 dark:bg-neutral-900">
                                   <Image
                                     className="h-full w-full object-cover"
                                     width={64}
