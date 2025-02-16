@@ -1,3 +1,4 @@
+// app/LifeExpectancyChart.tsx
 'use client';
 
 import Papa from 'papaparse';
@@ -38,18 +39,12 @@ export default function LifeExpectancyChart() {
 
   return (
     <div className="w-full h-[500px] p-2">
-      <h2 className="mb-2 text-lg font-semibold">
-        Life Expectancy (From CSV 2009 - 2021)
-      </h2>
       <ResponsiveContainer width="100%" height="100%">
         <LineChart data={chartData}>
           {/* Removed the CartesianGrid to eliminate the background grid */}
           <XAxis dataKey="Year" />
           {/* Force the Y-axis to show a range from 76 to 86 and format ticks to one decimal place */}
-          <YAxis
-            domain={[76, 86]}
-            tickFormatter={(tick) => tick.toFixed(1)}
-          />
+          <YAxis domain={[76, 86]} tickFormatter={(tick) => tick.toFixed(1)} />
           <Tooltip />
           <Legend verticalAlign="top" align="left" />
           <Line type="monotone" dataKey="United Kingdom" name="UK" stroke="#8884d8" dot={false} />
@@ -57,6 +52,9 @@ export default function LifeExpectancyChart() {
           <Line type="monotone" dataKey="Canada" name="Canada" stroke="#ff7300" dot={false} />
         </LineChart>
       </ResponsiveContainer>
+      <h2 className="mt-2 text-sm font-semibold text-black opacity-75 text-center">
+        Life Expectancy
+      </h2>
     </div>
   );
 }

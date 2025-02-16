@@ -158,7 +158,6 @@ export default function ChartSection() {
       {/* Top-left: Cumulative % Change chart */}
       <div className="col-span-1">
         <div className="w-full h-[500px] p-2">
-          <h2 className="mb-2 text-lg font-semibold">Cumulative % Change</h2>
           <ResponsiveContainer width="100%" height="100%">
             <LineChart data={cumData}>
               <CartesianGrid strokeDasharray="3 3" />
@@ -186,13 +185,15 @@ export default function ChartSection() {
               />
             </LineChart>
           </ResponsiveContainer>
+          <h2 className="mt-2 text-sm font-semibold text-black opacity-75 text-center">
+            Cumulative % Change
+          </h2>
         </div>
       </div>
 
       {/* Top-right: Year-over-Year % Change chart */}
       <div className="col-span-1">
         <div className="w-full h-[500px] p-2">
-          <h2 className="mb-2 text-lg font-semibold">Year-over-Year % Change</h2>
           <ResponsiveContainer width="100%" height="100%">
             <LineChart data={yoyData}>
               <CartesianGrid strokeDasharray="3 3" />
@@ -216,6 +217,9 @@ export default function ChartSection() {
               />
             </LineChart>
           </ResponsiveContainer>
+          <h2 className="mt-2 text-sm font-semibold text-black opacity-75 text-center">
+            Year-over-Year % Change
+          </h2>
         </div>
       </div>
 
@@ -236,9 +240,9 @@ export default function ChartSection() {
         }}
       >
         {/* Overlay for contrast */}
-        <div className="w-full h-full flex flex-col items-center justify-center bg-black bg-opacity-50 p-4 rounded">
-          <h3 className="text-xl font-semibold text-white mb-2">More Data</h3>
-          <p className="mb-4 text-center text-white">
+        <div className="w-full h-full flex flex-col items-center justify-center bg-white bg-opacity-50 p-4 rounded">
+          <h3 className="text-xl font-semibold text-black mb-2">More Data</h3>
+          <p className="mb-4 text-center text-black">
             Dive deeper into additional healthcare insurance data and charts.
           </p>
           <Link
