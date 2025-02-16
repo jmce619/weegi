@@ -42,10 +42,10 @@ function mergeStockAndIncomeData() {
   let incomeIndex = 0;
   const merged = unhData.map((record, i) => {
     const currentDate = parseDate(record.Date);
-    // Advance incomeIndex if the next income record is not later than the current date.
+    // Advance incomeIndex if the next income record's date is not later than the current date.
     while (
       incomeIndex < sortedIncome.length - 1 &&
-      parseDate(sortedIncome[incomeIndex + 1]!.Date).getTime() <= currentDate.getTime()
+      parseDate(sortedIncome[incomeIndex + 1].Date).getTime() <= currentDate.getTime()
     ) {
       incomeIndex++;
     }
