@@ -42,7 +42,7 @@ function mergeStockAndIncomeData() {
   let incomeIndex = 0;
   const merged = unhData.map((record, i) => {
     const currentDate = parseDate(record.Date);
-    // Advance incomeIndex if the next income record's date is ≤ currentDate
+    // Advance incomeIndex if the next income record is not later than the current date.
     while (
       incomeIndex < sortedIncome.length - 1 &&
       parseDate(sortedIncome[incomeIndex + 1]!.Date).getTime() <= currentDate.getTime()
@@ -55,7 +55,7 @@ function mergeStockAndIncomeData() {
       Centene: centeneData[i] ? centeneData[i].Close : null,
       Cigna: cignaData[i] ? cignaData[i].Close : null,
       Aetna: aetnaData[i] ? aetnaData[i].Close : null,
-      Income: sortedIncome[incomeIndex] ? sortedIncome[incomeIndex].Income : null
+      Income: sortedIncome[incomeIndex]?.Income ?? null
     };
   });
   return merged;
