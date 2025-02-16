@@ -43,9 +43,12 @@ export default async function HomePage() {
                   </div>
                 )}
               </div>
-              <h3 className="mb-1 font-medium">{product.title}</h3>
-              <p className="text-sm font-semibold">
-                {product.priceRange?.minVariantPrice?.amount}{' '}
+              <h3 className="mb-1 font-medium text-xs">{product.title}</h3>
+              <p className="text-lg font-semibold">
+                $
+                {parseFloat(
+                  product.priceRange?.minVariantPrice?.amount || "0"
+                ).toFixed(0)}{' '}
                 {product.priceRange?.minVariantPrice?.currencyCode}
               </p>
             </Link>
