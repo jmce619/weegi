@@ -78,11 +78,11 @@ function cumulativePercentChange(
   const sorted = [...data].sort(
     (a, b) => parseDate(a.Date).getTime() - parseDate(b.Date).getTime()
   );
-  const firstUNH = sorted[0].UNH;
-  const firstCentene = sorted[0].Centene;
-  const firstCigna = sorted[0].Cigna;
-  const firstAetna = sorted[0].Aetna;
-  const firstIncome = sorted[0].Income;
+  const firstUNH = sorted[0]!.UNH;
+  const firstCentene = sorted[0]!.Centene;
+  const firstCigna = sorted[0]!.Cigna;
+  const firstAetna = sorted[0]!.Aetna;
+  const firstIncome = sorted[0]!.Income;
 
   return sorted.map(row => ({
     Date: row.Date,
@@ -121,11 +121,11 @@ function rebaseTo100(
   const sorted = [...data].sort(
     (a, b) => parseDate(a.Date).getTime() - parseDate(b.Date).getTime()
   );
-  const firstUNH = sorted[0].UNH;
-  const firstCentene = sorted[0].Centene;
-  const firstCigna = sorted[0].Cigna;
-  const firstAetna = sorted[0].Aetna;
-  const firstIncome = sorted[0].Income;
+  const firstUNH = sorted[0]!.UNH;
+  const firstCentene = sorted[0]!.Centene;
+  const firstCigna = sorted[0]!.Cigna;
+  const firstAetna = sorted[0]!.Aetna;
+  const firstIncome = sorted[0]!.Income;
 
   return sorted.map(row => ({
     Date: row.Date,
