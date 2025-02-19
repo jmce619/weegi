@@ -34,11 +34,11 @@ export default function ChartSection() {
   ];
 
   return (
-    // Always force a 2-column grid.
     <div className="grid grid-cols-2 gap-6">
-      {/* Top-left: Cumulative Chart */}
-      <div className="relative aspect-square">
-        {/* Make sure CumulativeChart fills its parent */}
+      {/* Top-left: Cumulative Chart
+          Mobile: use a 2:1 ratio (half the height of a square)
+          Desktop: revert to square */}
+      <div className="relative aspect-[2/1] md:aspect-square">
         <CumulativeChart />
       </div>
 
@@ -52,7 +52,8 @@ export default function ChartSection() {
               margin={{ top: 5, bottom: 5, left: 5, right: 40 }}
             >
               <XAxis type="number" domain={[0, 'dataMax']} hide />
-              <YAxis dataKey="name" type="category" width={120} tick={{ fontSize: '10px' }} />
+              {/* Hide the Y-axis ticks since we'll show the name on the bar */}
+              <YAxis type="category" tick={false} />
               <Tooltip contentStyle={{ fontSize: '10px' }} />
               <Bar dataKey="rate">
                 {claimDenialData.map((entry, index) => {
@@ -61,6 +62,13 @@ export default function ChartSection() {
                   if (entry.name === 'Kaiser') fillColor = 'lightgreen';
                   return <Cell key={`cell-${index}`} fill={fillColor} />;
                 })}
+                {/* Display the bar's name inside the bar */}
+                <LabelList
+                  dataKey="name"
+                  position="insideLeft"
+                  style={{ fontSize: '10px', fill: 'white', fontWeight: 'bold' }}
+                />
+                {/* Display the percentage to the right of the bar */}
                 <LabelList
                   dataKey="rate"
                   position="right"
@@ -78,7 +86,6 @@ export default function ChartSection() {
 
       {/* Bottom-left: Life Expectancy Chart */}
       <div className="relative aspect-square">
-        {/* Make sure LifeExpectancyChart fills its parent */}
         <LifeExpectancyChart />
       </div>
 
