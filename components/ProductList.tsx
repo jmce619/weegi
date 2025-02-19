@@ -18,7 +18,7 @@ export default function ProductList({ products, initialLimit }: ProductListProps
 
   return (
     <>
-      <div className="grid grid-cols-4 gap-6">
+      <div className="grid grid-cols-3 md:grid-cols-4 gap-6">
         {displayedProducts.map((product) => {
           const firstImage = product.images?.[0];
           return (
@@ -41,11 +41,14 @@ export default function ProductList({ products, initialLimit }: ProductListProps
                   </div>
                 )}
               </div>
-              <h3 className="mb-1 font-medium">{product.title}</h3>
-              <p>
-                ${parseFloat(product.priceRange?.minVariantPrice?.amount || '0').toFixed(0)}{' '}
-                {product.priceRange?.minVariantPrice?.currencyCode}
-              </p>
+              <div className="text-left">
+                <p className="mb-1 text-sm font-medium">{product.title}</p>
+                <p className="text-sm">
+                  $
+                  {parseFloat(product.priceRange?.minVariantPrice?.amount || '0').toFixed(0)}{' '}
+                  {product.priceRange?.minVariantPrice?.currencyCode}
+                </p>
+              </div>
             </Link>
           );
         })}
