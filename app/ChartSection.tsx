@@ -19,14 +19,12 @@ import LifeExpectancyChart from './LifeExpectancyChart';
 // Custom hook to detect mobile viewport (width < 768px)
 function useIsMobile() {
   const [isMobile, setIsMobile] = useState(false);
-
   useEffect(() => {
     const checkIsMobile = () => setIsMobile(window.innerWidth < 768);
     checkIsMobile();
     window.addEventListener('resize', checkIsMobile);
     return () => window.removeEventListener('resize', checkIsMobile);
   }, []);
-
   return isMobile;
 }
 
@@ -71,16 +69,18 @@ export default function ChartSection() {
               layout="vertical"
               margin={{ top: 5, bottom: 5, left: 5, right: 40 }}
             >
-              {/* Hide ticks on mobile, show them on larger screens */}
               <XAxis
                 type="number"
                 domain={[0, 'dataMax']}
                 tick={isMobile ? false : { fontSize: '10px' }}
-                hide={false}
+                axisLine={isMobile ? false : true}
+                tickLine={isMobile ? false : true}
               />
               <YAxis
                 type="category"
                 tick={isMobile ? false : { fontSize: '10px' }}
+                axisLine={isMobile ? false : true}
+                tickLine={isMobile ? false : true}
               />
               <Tooltip contentStyle={{ fontSize: isMobile ? '8px' : '10px' }} />
               <Bar dataKey="rate">
@@ -137,7 +137,11 @@ export default function ChartSection() {
         >
           <div className="w-full h-full flex flex-col items-center justify-center bg-white bg-opacity-50 p-4 rounded">
             <h3 className="text-xl font-semibold text-black mb-2">More Data</h3>
-            <p className="mb-4 text-center text-black">
+            <p
+              className={`mb-4 text-center text-black ${
+                isMobile ? 'text-xs' : 'text-base'
+              }`}
+            >
               Dive deeper into additional healthcare insurance data and charts.
             </p>
             <Link
