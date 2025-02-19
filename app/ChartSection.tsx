@@ -143,10 +143,11 @@ export default function ChartSection() {
               <XAxis
                 dataKey="Date"
                 tickFormatter={(tick) => String(new Date(tick).getFullYear())}
+                tick={{ fontSize: '10px' }}
               />
-              <YAxis />
-              <Tooltip />
-              <Legend verticalAlign="top" align="left" />
+              <YAxis tick={{ fontSize: '10px' }} />
+              <Tooltip contentStyle={{ fontSize: '10px' }} />
+              <Legend verticalAlign="top" align="right" wrapperStyle={{ fontSize: '9px' }} />
               <Line
                 type="monotone"
                 dataKey="CumClose"
@@ -164,7 +165,7 @@ export default function ChartSection() {
             </LineChart>
           </ResponsiveContainer>
         </div>
-        <p className="mt-2 text-center text-sm font-semibold text-black opacity-75">
+        <p className="mt-2 text-center text-xs font-semibold text-black opacity-75">
           Cumulative % Change
         </p>
       </div>
@@ -180,8 +181,8 @@ export default function ChartSection() {
             >
               {/* Remove grid and legend for a cleaner look */}
               <XAxis type="number" domain={[0, 'dataMax']} hide />
-              <YAxis dataKey="name" type="category" width={120} />
-              <Tooltip />
+              <YAxis dataKey="name" type="category" width={120} tick={{ fontSize: '13px' }} />
+              <Tooltip contentStyle={{ fontSize: '10px' }} />
               <Bar dataKey="rate">
                 {claimDenialData.map((entry, index) => {
                   let fillColor = "#8884d8"; // default color
@@ -193,12 +194,13 @@ export default function ChartSection() {
                   dataKey="rate"
                   position="right"
                   formatter={(value: number): string => `${value}%`}
+                  style={{ fontSize: '10px' }}
                 />
               </Bar>
             </BarChart>
           </ResponsiveContainer>
         </div>
-        <p className="mt-2 text-center text-sm font-semibold text-black opacity-75">
+        <p className="mt-2 text-center text-xs font-semibold text-black opacity-75">
           Claim Denial Rates (2024)
         </p>
       </div>
