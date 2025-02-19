@@ -54,10 +54,11 @@ export default function ChartSection() {
       <div className="relative aspect-square">
         <CumulativeChart />
         <div className="absolute top-0 left-0 w-full p-1 z-10">
-          <h3 className="text-xs md:text-base font-bold text-center bg-white bg-opacity-75">
-            Healthcare Insurance Stocks vs Median Family Income (% Change)
-          </h3>
+
         </div>
+        <p className="mt-1 text-center text-xs font-semibold text-black opacity-75">
+          Median Family Income vs. Healthcare Insurance Stock Prices
+          </p>
       </div>
 
       {/* Top-right: Claim Denial Rates Bar Chart */}

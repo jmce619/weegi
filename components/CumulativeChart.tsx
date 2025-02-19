@@ -3,7 +3,6 @@
 
 import { useMemo } from 'react';
 import {
-  CartesianGrid,
   Line,
   LineChart,
   ResponsiveContainer,
@@ -102,11 +101,11 @@ export default function CumulativeChart() {
   const cumData = useMemo(() => cumulativePercentChange(mergedData), [mergedData]);
 
   return (
-    // Updated container: use h-full so it fills the parent's dimensions
+    // Use h-full to allow the parent container to control the size.
     <div className="w-full h-full p-1 relative">
       <ResponsiveContainer width="100%" height="100%">
         <LineChart data={cumData} margin={{ top: 5, right: 5, bottom: 5, left: 5 }}>
-          <CartesianGrid strokeDasharray="3 3" />
+          {/* Removed <CartesianGrid strokeDasharray="3 3" /> */}
           <XAxis
             dataKey="Date"
             tickFormatter={(tick) => new Date(tick).getFullYear().toString()}
