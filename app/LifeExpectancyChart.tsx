@@ -4,7 +4,6 @@
 import Papa from 'papaparse';
 import { useEffect, useState } from 'react';
 import {
-  Legend,
   Line,
   LineChart,
   ResponsiveContainer,
@@ -25,7 +24,9 @@ export default function LifeExpectancyChart() {
       header: true,       // Use first row as headers
       dynamicTyping: true, // Convert numeric strings to numbers
       complete: (results) => {
-        setChartData(results.data as Array<{ Year: string; [country: string]: any }>);
+        setChartData(
+          results.data as Array<{ Year: string; [country: string]: any }>
+        );
       },
       error: (err) => {
         console.error('Error parsing CSV:', err);
@@ -38,20 +39,58 @@ export default function LifeExpectancyChart() {
   }
 
   return (
-    <div className="w-full h-[500px] p-2">
+    // Set the container to relative to position the overlay correctly
+    <div className="w-full h-[500px] p-2 relative">
       <ResponsiveContainer width="100%" height="100%">
         <LineChart data={chartData}>
-          {/* Removed the CartesianGrid to eliminate the background grid */}
-          <XAxis dataKey="Year" />
-          {/* Force the Y-axis to show a range from 76 to 86 and format ticks to one decimal place */}
-          <YAxis domain={[76, 86]} tickFormatter={(tick) => tick.toFixed(1)} />
+          {/* Style the ticks to be small */}
+          <XAxis dataKey="Year" tick={{ fontSize: '10px' }} />
+          <YAxis
+            domain={[76, 86]}
+            tickFormatter={(tick) => tick.toFixed(1)}
+            tick={{ fontSize: '10px' }}
+          />
           <Tooltip />
-          <Legend verticalAlign="top" align="left" />
-          <Line type="monotone" dataKey="United Kingdom" name="UK" stroke="#8884d8" dot={false} />
-          <Line type="monotone" dataKey="United States" name="US" stroke="#82ca9d" dot={false} />
-          <Line type="monotone" dataKey="Canada" name="Canada" stroke="#ff7300" dot={false} />
+          {/* Built-in Legend removed */}
+          <Line
+            type="monotone"
+            dataKey="United Kingdom"
+            name="UK"
+            stroke="#8884d8"
+            dot={false}
+          />
+          <Line
+            type="monotone"
+            dataKey="United States"
+            name="US"
+            stroke="#82ca9d"
+            dot={false}
+          />
+          <Line
+            type="monotone"
+            dataKey="Canada"
+            name="Canada"
+            stroke="#ff7300"
+            dot={false}
+          />
         </LineChart>
       </ResponsiveContainer>
+      {/* Custom legend overlay */}
+      <div
+        style={{
+          position: 'absolute',
+          top: 20,
+          left: 70,
+          fontSize: '9px',
+          backgroundColor: 'rgba(255, 255, 255, 0.7)',
+          padding: '5px',
+          borderRadius: '4px'
+        }}
+      >
+        <div style={{ color: '#8884d8' }}>UK</div>
+        <div style={{ color: '#82ca9d' }}>US</div>
+        <div style={{ color: '#ff7300' }}>Canada</div>
+      </div>
       <h2 className="mt-2 text-sm font-semibold text-black opacity-75 text-center">
         Life Expectancy
       </h2>
