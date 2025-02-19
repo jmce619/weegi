@@ -25,14 +25,18 @@ export function Navbar() {
       <nav className="relative flex items-center justify-between p-4 shadow">
         {/* LEFT: Logo */}
         <Link href="/" className="shrink-0">
+        <div className="relative w-40 h-12"> 
+          {/* w-40 = 10rem, h-12 = 3rem; adjust as needed */}
           <Image
-            src="/weegi_full_logo.png" // Ensure this file is in /public
+            src="/weegi_full_logo.png"
             alt="My Brand Logo"
-            width={120}
-            height={40}
+            fill
+            style={{ objectFit: 'contain' }}
             priority
           />
-        </Link>
+        </div>
+      </Link>
+
 
         {/* CENTER: Positioned text in red (visible only on medium and larger screens) */}
         <div className="hidden md:absolute md:left-1/2 md:top-1/2 md:-translate-x-1/2 md:-translate-y-1/2">
