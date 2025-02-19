@@ -57,7 +57,7 @@ export default function ChartSection() {
 
         </div>
         <p className="mt-1 text-center text-xs font-semibold text-black opacity-75">
-          Median Family Income vs. Healthcare Insurance Stock Prices
+          Median Family Income vs. Healthcare Insurance Stock Prices ( % Change YoY)
           </p>
       </div>
 
