@@ -214,13 +214,14 @@ export default function ChartSection() {
 
       {/* Bottom-right: Info Card with Background Image */}
       <div
-        className="col-span-1 flex items-center justify-center p-0 rounded shadow-sm"
+        className="col-span-1 flex items-center justify-center p-0 rounded"
         style={{
           backgroundImage: "url('/images/your-background.png')",
           backgroundSize: 'cover',
           backgroundPosition: 'center'
         }}
       >
+        {/* Overlay for contrast */}
         <div className="w-full h-full flex flex-col items-center justify-center bg-white bg-opacity-50 p-4 rounded">
           <h3 className="text-xl font-semibold text-black mb-2">More Data</h3>
           <p className="mb-4 text-center text-black">
@@ -234,6 +235,7 @@ export default function ChartSection() {
           </Link>
         </div>
       </div>
+
     </div>
   );
 }
