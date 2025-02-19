@@ -102,8 +102,8 @@ export default function CumulativeChart() {
   const cumData = useMemo(() => cumulativePercentChange(mergedData), [mergedData]);
 
   return (
-    // The container is relative so the custom legend can be absolutely positioned
-    <div className="w-full h-[500px] p-2 relative">
+    // Updated container: use h-full so it fills the parent's dimensions
+    <div className="w-full h-full p-1 relative">
       <ResponsiveContainer width="100%" height="100%">
         <LineChart data={cumData} margin={{ top: 5, right: 5, bottom: 5, left: 5 }}>
           <CartesianGrid strokeDasharray="3 3" />
@@ -121,7 +121,7 @@ export default function CumulativeChart() {
           <Line type="monotone" dataKey="CumIncome" name="Median Income" stroke="black" dot={false} />
         </LineChart>
       </ResponsiveContainer>
-      {/* Custom legend overlay that doesn't affect the chart size */}
+      {/* Custom legend overlay */}
       <div
         style={{
           position: 'absolute',

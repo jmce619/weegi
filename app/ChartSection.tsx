@@ -35,57 +35,53 @@ export default function ChartSection() {
 
   return (
     <div className="grid grid-cols-2 gap-6">
-      {/* Top-left: Cumulative Chart with Title */}
-      <div>
-        <div className="relative aspect-[2/1] md:aspect-square">
-          <CumulativeChart />
+      {/* Top-left: Cumulative Chart with title overlay */}
+      <div className="relative aspect-square">
+        <CumulativeChart />
+        <div className="absolute top-0 left-0 w-full p-1 z-10">
+
+
         </div>
-        <p className="mt-2 text-center text-xs font-semibold text-black opacity-75">
-          Healthcare Insurance Stocks vs Median Family Income (% Change)
+        <p className="mt-1 text-center text-xs font-semibold text-black opacity-75">
+          Claim Denial Rates (2024)
         </p>
       </div>
 
-      {/* Top-right: Claim Denial Rates Bar Chart with Title */}
-      <div>
-        <div className="relative aspect-[2/1] md:aspect-square">
-          {/* Removed inner padding to match the top-left cell height */}
-          <div className="w-full h-full">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart
-                data={claimDenialData}
-                layout="vertical"
-                margin={{ top: 5, bottom: 5, left: 5, right: 40 }}
-              >
-                <XAxis type="number" domain={[0, 'dataMax']} hide />
-                {/* Hide the Y-axis ticks; we'll show the name on the bar */}
-                <YAxis type="category" tick={false} />
-                <Tooltip contentStyle={{ fontSize: '10px' }} />
-                <Bar dataKey="rate">
-                  {claimDenialData.map((entry, index) => {
-                    let fillColor = "#8884d8";
-                    if (entry.name === 'United Healthcare') fillColor = 'red';
-                    if (entry.name === 'Kaiser') fillColor = 'lightgreen';
-                    return <Cell key={`cell-${index}`} fill={fillColor} />;
-                  })}
-                  {/* Label for the insurance name inside the bar */}
-                  <LabelList
-                    dataKey="name"
-                    position="insideLeft"
-                    style={{ fontSize: '10px', fill: 'white', fontWeight: 'bold' }}
-                  />
-                  {/* Label for the percentage to the right of the bar */}
-                  <LabelList
-                    dataKey="rate"
-                    position="right"
-                    formatter={(value: number): string => `${value}%`}
-                    style={{ fontSize: '10px', fill: 'black', fontWeight: 'bold' }}
-                  />
-                </Bar>
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
+      {/* Top-right: Claim Denial Rates bar chart */}
+      <div className="relative aspect-square">
+        <div className="w-full h-full">
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart
+              data={claimDenialData}
+              layout="vertical"
+              margin={{ top: 5, bottom: 5, left: 5, right: 40 }}
+            >
+              <XAxis type="number" domain={[0, 'dataMax']} hide />
+              <YAxis type="category" tick={false} />
+              <Tooltip contentStyle={{ fontSize: '10px' }} />
+              <Bar dataKey="rate">
+                {claimDenialData.map((entry, index) => {
+                  let fillColor = "#8884d8";
+                  if (entry.name === 'United Healthcare') fillColor = 'red';
+                  if (entry.name === 'Kaiser') fillColor = 'lightgreen';
+                  return <Cell key={`cell-${index}`} fill={fillColor} />;
+                })}
+                <LabelList
+                  dataKey="name"
+                  position="insideLeft"
+                  style={{ fontSize: '10px', fill: 'white', fontWeight: 'bold' }}
+                />
+                <LabelList
+                  dataKey="rate"
+                  position="right"
+                  formatter={(value: number): string => `${value}%`}
+                  style={{ fontSize: '10px', fill: 'black', fontWeight: 'bold' }}
+                />
+              </Bar>
+            </BarChart>
+          </ResponsiveContainer>
         </div>
-        <p className="mt-2 text-center text-xs font-semibold text-black opacity-75">
+        <p className="mt-1 text-center text-xs font-semibold text-black opacity-75">
           Claim Denial Rates (2024)
         </p>
       </div>
