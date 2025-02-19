@@ -34,10 +34,11 @@ export default function ChartSection() {
   ];
 
   return (
-    // No fixed overall height so the grid flows naturally on mobile.
+    // Always force a 2-column grid.
     <div className="grid grid-cols-2 gap-6">
       {/* Top-left: Cumulative Chart */}
       <div className="relative aspect-square">
+        {/* Make sure CumulativeChart fills its parent */}
         <CumulativeChart />
       </div>
 
@@ -55,7 +56,7 @@ export default function ChartSection() {
               <Tooltip contentStyle={{ fontSize: '10px' }} />
               <Bar dataKey="rate">
                 {claimDenialData.map((entry, index) => {
-                  let fillColor = "#8884d8"; // default color
+                  let fillColor = "#8884d8";
                   if (entry.name === 'United Healthcare') fillColor = 'red';
                   if (entry.name === 'Kaiser') fillColor = 'lightgreen';
                   return <Cell key={`cell-${index}`} fill={fillColor} />;
@@ -77,6 +78,7 @@ export default function ChartSection() {
 
       {/* Bottom-left: Life Expectancy Chart */}
       <div className="relative aspect-square">
+        {/* Make sure LifeExpectancyChart fills its parent */}
         <LifeExpectancyChart />
       </div>
 
