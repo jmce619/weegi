@@ -34,18 +34,15 @@ export default function ChartSection() {
   ];
 
   return (
-    // Set the grid container height to 1200px (or adjust as needed)
-    <div className="grid grid-rows-2 grid-cols-2 gap-6 h-[1200px]">
+    // No fixed overall height so the grid flows naturally on mobile.
+    <div className="grid grid-cols-2 gap-6">
       {/* Top-left: Cumulative Chart */}
-      <div className="col-span-1">
-        {/* Ensure the chart component fills the available space */}
-        <div className="w-full h-full">
-          <CumulativeChart />
-        </div>
+      <div className="relative aspect-square">
+        <CumulativeChart />
       </div>
 
       {/* Top-right: Claim Denial Rates bar chart */}
-      <div className="col-span-1">
+      <div className="relative aspect-square">
         <div className="w-full h-full p-2">
           <ResponsiveContainer width="100%" height="100%">
             <BarChart
@@ -79,16 +76,14 @@ export default function ChartSection() {
       </div>
 
       {/* Bottom-left: Life Expectancy Chart */}
-      <div className="col-span-1">
-        <div className="relative h-full p-2">
-          <LifeExpectancyChart />
-        </div>
+      <div className="relative aspect-square">
+        <LifeExpectancyChart />
       </div>
 
       {/* Bottom-right: Info Card */}
-      <div className="col-span-1">
+      <div className="relative aspect-square">
         <div
-          className="relative flex items-center justify-center p-0 rounded h-full"
+          className="flex items-center justify-center p-0 rounded h-full"
           style={{
             backgroundImage: "url('/images/your-background.png')",
             backgroundSize: 'cover',

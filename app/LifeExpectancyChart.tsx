@@ -39,11 +39,10 @@ export default function LifeExpectancyChart() {
   }
 
   return (
-    // Set the container to relative to position the overlay correctly
-    <div className="w-full h-[500px] p-2 relative">
+    // Use h-full so that the chart fills the parent square
+    <div className="w-full h-full p-2 relative">
       <ResponsiveContainer width="100%" height="100%">
         <LineChart data={chartData}>
-          {/* Style the ticks to be small */}
           <XAxis dataKey="Year" tick={{ fontSize: '10px' }} />
           <YAxis
             domain={[76, 86]}
@@ -51,7 +50,6 @@ export default function LifeExpectancyChart() {
             tick={{ fontSize: '10px' }}
           />
           <Tooltip />
-          {/* Built-in Legend removed */}
           <Line
             type="monotone"
             dataKey="United Kingdom"
