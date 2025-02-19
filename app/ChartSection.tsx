@@ -193,7 +193,7 @@ export default function ChartSection() {
               <LabelList
                 dataKey="rate"
                 position="right"
-                formatter={(value) => `${value}%`}
+                formatter={(value: number): string => `${value}%`}
               />
             </Bar>
           </BarChart>
