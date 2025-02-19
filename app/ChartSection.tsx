@@ -133,10 +133,10 @@ export default function ChartSection() {
   ];
 
   return (
-    <div className="grid grid-rows-2 grid-cols-2 gap-6">
-      {/* Top-left: Cumulative % Change chart */}
-      <div className="col-span-1 flex flex-col">
-        <div className="flex-grow">
+    <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+      {/* Cumulative % Change chart */}
+      <div className="flex flex-col">
+        <div className="relative aspect-square p-2">
           <ResponsiveContainer width="100%" height="100%">
             <LineChart data={cumData}>
               <CartesianGrid strokeDasharray="3 3" />
@@ -169,52 +169,48 @@ export default function ChartSection() {
         </p>
       </div>
 
-      {/* Top-right: Claim Denial Rates horizontal bar chart */}
-{/* Top-right: Claim Denial Rates horizontal bar chart */}
-    <div className="col-span-1 flex flex-col">
-      <div className="flex-grow">
-        <ResponsiveContainer width="100%" height="100%">
-          <BarChart
-            data={claimDenialData}
-            layout="vertical"
-            margin={{ top: 5, bottom: 5, left: 5, right: 40 }} // Added right margin
-          >
-            {/* Removed background grid and legend */}
-            <XAxis type="number" domain={[0, 'dataMax']} hide />
-            <YAxis dataKey="name" type="category" width={120} />
-            <Tooltip />
-            <Bar dataKey="rate">
-              {claimDenialData.map((entry, index) => {
-                let fillColor = "#8884d8"; // default color
-                if (entry.name === 'United Healthcare') fillColor = 'red';
-                if (entry.name === 'Kaiser') fillColor = 'lightgreen';
-                return <Cell key={`cell-${index}`} fill={fillColor} />;
-              })}
-              <LabelList
-                dataKey="rate"
-                position="right"
-                formatter={(value: number): string => `${value}%`}
-              />
-            </Bar>
-          </BarChart>
-        </ResponsiveContainer>
-      </div>
-      <p className="mt-2 text-center text-sm font-semibold text-black opacity-75">
-        Claim Denial Rates (2024)
-      </p>
-    </div>
-
-
-      {/* Bottom-left: Life Expectancy Chart */}
-      <div className="col-span-1">
-        <div className="w-full h-[500px] p-2">
-          <LifeExpectancyChart />
+      {/* Claim Denial Rates horizontal bar chart */}
+      <div className="flex flex-col">
+        <div className="relative aspect-square p-2">
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart
+              data={claimDenialData}
+              layout="vertical"
+              margin={{ top: 5, bottom: 5, left: 5, right: 40 }}
+            >
+              {/* Remove grid and legend for a cleaner look */}
+              <XAxis type="number" domain={[0, 'dataMax']} hide />
+              <YAxis dataKey="name" type="category" width={120} />
+              <Tooltip />
+              <Bar dataKey="rate">
+                {claimDenialData.map((entry, index) => {
+                  let fillColor = "#8884d8"; // default color
+                  if (entry.name === 'United Healthcare') fillColor = 'red';
+                  if (entry.name === 'Kaiser') fillColor = 'lightgreen';
+                  return <Cell key={`cell-${index}`} fill={fillColor} />;
+                })}
+                <LabelList
+                  dataKey="rate"
+                  position="right"
+                  formatter={(value: number): string => `${value}%`}
+                />
+              </Bar>
+            </BarChart>
+          </ResponsiveContainer>
         </div>
+        <p className="mt-2 text-center text-sm font-semibold text-black opacity-75">
+          Claim Denial Rates (2024)
+        </p>
       </div>
 
-      {/* Bottom-right: Info Card with Background Image */}
+      {/* Life Expectancy Chart */}
+      <div className="relative aspect-square p-2">
+        <LifeExpectancyChart />
+      </div>
+
+      {/* Info Card with Background Image */}
       <div
-        className="col-span-1 flex items-center justify-center p-0 rounded"
+        className="relative flex items-center justify-center p-0 rounded"
         style={{
           backgroundImage: "url('/images/your-background.png')",
           backgroundSize: 'cover',
@@ -235,7 +231,6 @@ export default function ChartSection() {
           </Link>
         </div>
       </div>
-
     </div>
   );
 }
