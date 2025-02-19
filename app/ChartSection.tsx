@@ -34,22 +34,25 @@ export default function ChartSection() {
   ];
 
   return (
-    <div className="grid grid-rows-2 grid-cols-2 gap-6">
+    // Set the grid container height to 1200px (or adjust as needed)
+    <div className="grid grid-rows-2 grid-cols-2 gap-6 h-[1200px]">
       {/* Top-left: Cumulative Chart */}
       <div className="col-span-1">
-        <CumulativeChart />
+        {/* Ensure the chart component fills the available space */}
+        <div className="w-full h-full">
+          <CumulativeChart />
+        </div>
       </div>
 
       {/* Top-right: Claim Denial Rates bar chart */}
       <div className="col-span-1">
-        <div className="w-full h-[500px] p-2">
+        <div className="w-full h-full p-2">
           <ResponsiveContainer width="100%" height="100%">
             <BarChart
               data={claimDenialData}
               layout="vertical"
               margin={{ top: 5, bottom: 5, left: 5, right: 40 }}
             >
-              {/* Grid removed for a cleaner look */}
               <XAxis type="number" domain={[0, 'dataMax']} hide />
               <YAxis dataKey="name" type="category" width={120} tick={{ fontSize: '10px' }} />
               <Tooltip contentStyle={{ fontSize: '10px' }} />
@@ -76,30 +79,34 @@ export default function ChartSection() {
       </div>
 
       {/* Bottom-left: Life Expectancy Chart */}
-      <div className="relative aspect-square p-2">
-        <LifeExpectancyChart />
+      <div className="col-span-1">
+        <div className="relative h-full p-2">
+          <LifeExpectancyChart />
+        </div>
       </div>
 
       {/* Bottom-right: Info Card */}
-      <div
-        className="relative flex items-center justify-center p-0 rounded"
-        style={{
-          backgroundImage: "url('/images/your-background.png')",
-          backgroundSize: 'cover',
-          backgroundPosition: 'center'
-        }}
-      >
-        <div className="w-full h-full flex flex-col items-center justify-center bg-white bg-opacity-50 p-4 rounded">
-          <h3 className="text-xl font-semibold text-black mb-2">More Data</h3>
-          <p className="mb-4 text-center text-black">
-            Dive deeper into additional healthcare insurance data and charts.
-          </p>
-          <Link
-            href="/Study-1"
-            className="inline-block rounded-md bg-red-600 px-4 py-2 text-white hover:bg-red-700 transition"
-          >
-            Explore
-          </Link>
+      <div className="col-span-1">
+        <div
+          className="relative flex items-center justify-center p-0 rounded h-full"
+          style={{
+            backgroundImage: "url('/images/your-background.png')",
+            backgroundSize: 'cover',
+            backgroundPosition: 'center'
+          }}
+        >
+          <div className="w-full h-full flex flex-col items-center justify-center bg-white bg-opacity-50 p-4 rounded">
+            <h3 className="text-xl font-semibold text-black mb-2">More Data</h3>
+            <p className="mb-4 text-center text-black">
+              Dive deeper into additional healthcare insurance data and charts.
+            </p>
+            <Link
+              href="/Study-1"
+              className="inline-block rounded-md bg-red-600 px-4 py-2 text-white hover:bg-red-700 transition"
+            >
+              Explore
+            </Link>
+          </div>
         </div>
       </div>
     </div>
