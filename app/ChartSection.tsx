@@ -133,7 +133,8 @@ export default function ChartSection() {
   ];
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+    // Changed grid classes to always display 2 columns (even on mobile)
+    <div className="grid grid-cols-2 gap-6">
       {/* Cumulative % Change chart */}
       <div className="flex flex-col">
         <div className="relative aspect-square p-2">
@@ -179,7 +180,6 @@ export default function ChartSection() {
               layout="vertical"
               margin={{ top: 5, bottom: 5, left: 5, right: 40 }}
             >
-              {/* Remove grid and legend for a cleaner look */}
               <XAxis type="number" domain={[0, 'dataMax']} hide />
               <YAxis dataKey="name" type="category" width={120} tick={{ fontSize: '13px' }} />
               <Tooltip contentStyle={{ fontSize: '10px' }} />
@@ -219,7 +219,6 @@ export default function ChartSection() {
           backgroundPosition: 'center'
         }}
       >
-        {/* Overlay for contrast */}
         <div className="w-full h-full flex flex-col items-center justify-center bg-white bg-opacity-50 p-4 rounded">
           <h3 className="text-xl font-semibold text-black mb-2">More Data</h3>
           <p className="mb-4 text-center text-black">
