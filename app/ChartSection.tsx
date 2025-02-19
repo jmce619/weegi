@@ -4,7 +4,11 @@
 import Link from 'next/link';
 import { useMemo } from 'react';
 import {
+  Bar,
+  BarChart,
   CartesianGrid,
+  Cell,
+  LabelList,
   Legend,
   Line,
   LineChart,
@@ -94,48 +98,8 @@ function cumulativePercentChange(
   return result;
 }
 
-/**
- * Compute the year-over-year percentage change for Close and Income values.
- */
-function yearOverYearChange(
-  data: Array<{ Date: string; Close: number; Income: number }>
-) {
-  if (!data.length) return [];
-
-  const sorted = [...data].sort(
-    (a, b) => parseDate(a.Date).getTime() - parseDate(b.Date).getTime()
-  );
-  const yearMap = new Map<number, { Date: string; Close: number; Income: number }>();
-
-  for (const row of sorted) {
-    const y = parseDate(row.Date).getFullYear();
-    yearMap.set(y, row);
-  }
-
-  const yearlyArr = Array.from(yearMap.entries()).map(([year, row]) => ({
-    year,
-    Close: row.Close,
-    Income: row.Income
-  }));
-  yearlyArr.sort((a, b) => a.year - b.year);
-
-  const output = [];
-  for (let i = 1; i < yearlyArr.length; i++) {
-    const prev = yearlyArr[i - 1]!;
-    const curr = yearlyArr[i]!;
-    const yoyClose = ((curr.Close - prev.Close) / prev.Close) * 100;
-    const yoyIncome = ((curr.Income - prev.Income) / prev.Income) * 100;
-    output.push({
-      Date: String(curr.year),
-      YoYClose: yoyClose,
-      YoYIncome: yoyIncome
-    });
-  }
-  return output;
-}
-
 export default function ChartSection() {
-  // 1) Extract UNH + MFI arrays from the JSON
+  // 1) Extract UNH and MFI arrays from the JSON
   const unhData = combinedData.unh_data || [];
   const mfiData = combinedData.median_income || [];
 
@@ -143,25 +107,39 @@ export default function ChartSection() {
     return <p>No chart data available</p>;
   }
 
-  // 2) Merge daily UNH with monthly MFI data
+  // 2) Merge the data and compute cumulative percentage change
   const mergedDaily = useMemo(() => mergeAsOf(unhData, mfiData), [unhData, mfiData]);
   if (!mergedDaily.length) {
     return <p>No merged data found</p>;
   }
-
-  // 3) Compute transformations
   const cumData = useMemo(() => cumulativePercentChange(mergedDaily), [mergedDaily]);
-  const yoyData = useMemo(() => yearOverYearChange(mergedDaily), [mergedDaily]);
+
+  // Define Claim Denial Rates data
+  const claimDenialData = [
+    { name: 'United Healthcare', rate: 33 },
+    { name: 'Blue Cross', rate: 22 },
+    { name: 'Aetna', rate: 22 },
+    { name: 'Cigna', rate: 21 },
+    { name: 'CareSource', rate: 21 },
+    { name: 'Select Health', rate: 19 },
+    { name: 'Anthem', rate: 18 },
+    { name: 'Oscar', rate: 17 },
+    { name: 'Superior Health', rate: 15 },
+    { name: 'CHRISTUS', rate: 15 },
+    { name: 'Ambetter', rate: 14 },
+    { name: 'HealthOptions', rate: 14 },
+    { name: 'Celtic', rate: 13 },
+    { name: 'Kaiser', rate: 6 }
+  ];
 
   return (
     <div className="grid grid-rows-2 grid-cols-2 gap-6">
       {/* Top-left: Cumulative % Change chart */}
-      <div className="col-span-1">
-        <div className="w-full h-[500px] p-2">
+      <div className="col-span-1 flex flex-col">
+        <div className="flex-grow">
           <ResponsiveContainer width="100%" height="100%">
             <LineChart data={cumData}>
               <CartesianGrid strokeDasharray="3 3" />
-              {/* Format x-axis ticks to show only the year */}
               <XAxis
                 dataKey="Date"
                 tickFormatter={(tick) => String(new Date(tick).getFullYear())}
@@ -185,43 +163,47 @@ export default function ChartSection() {
               />
             </LineChart>
           </ResponsiveContainer>
-          <h2 className="mt-2 text-sm font-semibold text-black opacity-75 text-center">
-            Cumulative % Change
-          </h2>
         </div>
+        <p className="mt-2 text-center text-sm font-semibold text-black opacity-75">
+          Cumulative % Change
+        </p>
       </div>
 
-      {/* Top-right: Year-over-Year % Change chart */}
-      <div className="col-span-1">
-        <div className="w-full h-[500px] p-2">
-          <ResponsiveContainer width="100%" height="100%">
-            <LineChart data={yoyData}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="Date" />
-              <YAxis />
-              <Tooltip />
-              <Legend verticalAlign="top" align="left" />
-              <Line
-                type="monotone"
-                dataKey="YoYClose"
-                name="United Healthcare Stock Price"
-                stroke="red"
-                dot={false}
+      {/* Top-right: Claim Denial Rates horizontal bar chart */}
+{/* Top-right: Claim Denial Rates horizontal bar chart */}
+    <div className="col-span-1 flex flex-col">
+      <div className="flex-grow">
+        <ResponsiveContainer width="100%" height="100%">
+          <BarChart
+            data={claimDenialData}
+            layout="vertical"
+            margin={{ top: 5, bottom: 5, left: 5, right: 40 }} // Added right margin
+          >
+            {/* Removed background grid and legend */}
+            <XAxis type="number" domain={[0, 'dataMax']} hide />
+            <YAxis dataKey="name" type="category" width={120} />
+            <Tooltip />
+            <Bar dataKey="rate">
+              {claimDenialData.map((entry, index) => {
+                let fillColor = "#8884d8"; // default color
+                if (entry.name === 'United Healthcare') fillColor = 'red';
+                if (entry.name === 'Kaiser') fillColor = 'lightgreen';
+                return <Cell key={`cell-${index}`} fill={fillColor} />;
+              })}
+              <LabelList
+                dataKey="rate"
+                position="right"
+                formatter={(value) => `${value}%`}
               />
-              <Line
-                type="monotone"
-                dataKey="YoYIncome"
-                name="Median Family Income (U.S.)"
-                stroke="black"
-                dot={false}
-              />
-            </LineChart>
-          </ResponsiveContainer>
-          <h2 className="mt-2 text-sm font-semibold text-black opacity-75 text-center">
-            Year-over-Year % Change
-          </h2>
-        </div>
+            </Bar>
+          </BarChart>
+        </ResponsiveContainer>
       </div>
+      <p className="mt-2 text-center text-sm font-semibold text-black opacity-75">
+        Claim Denial Rates (2024)
+      </p>
+    </div>
+
 
       {/* Bottom-left: Life Expectancy Chart */}
       <div className="col-span-1">
@@ -239,7 +221,6 @@ export default function ChartSection() {
           backgroundPosition: 'center'
         }}
       >
-        {/* Overlay for contrast */}
         <div className="w-full h-full flex flex-col items-center justify-center bg-white bg-opacity-50 p-4 rounded">
           <h3 className="text-xl font-semibold text-black mb-2">More Data</h3>
           <p className="mb-4 text-center text-black">

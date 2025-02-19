@@ -1,8 +1,7 @@
 // app/page.tsx
 
+import ProductList from 'components/ProductList';
 import { getProducts } from 'lib/shopify';
-import Image from 'next/image';
-import Link from 'next/link';
 import ChartSection from './ChartSection';
 
 export default async function HomePage() {
@@ -17,44 +16,11 @@ export default async function HomePage() {
       {/* Chart Section */}
       <ChartSection />
 
-      {/* Add spacing above "All Products" */}
+      {/* Spacing and title */}
       <h2 className="mt-8 mb-6 text-2xl font-bold">All Products</h2>
 
-      <div className="grid grid-cols-3 gap-6">
-        {products.map((product) => {
-          const firstImage = product.images?.[0];
-          return (
-            <Link
-              key={product.handle}
-              href={`/product/${product.handle}`}
-              className="block overflow-hidden rounded p-4 transition"
-            >
-              <div className="relative mb-3 aspect-square w-full">
-                {firstImage?.url ? (
-                  <Image
-                    src={firstImage.url}
-                    alt={firstImage.altText ?? product.title}
-                    fill
-                    style={{ objectFit: 'cover' }}
-                  />
-                ) : (
-                  <div className="flex h-full w-full items-center justify-center bg-gray-100">
-                    No Image
-                  </div>
-                )}
-              </div>
-              <h3 className="mb-1 font-medium text-xs">{product.title}</h3>
-              <p className="text-lg font-semibold">
-                $
-                {parseFloat(
-                  product.priceRange?.minVariantPrice?.amount || "0"
-                ).toFixed(0)}{' '}
-                {product.priceRange?.minVariantPrice?.currencyCode}
-              </p>
-            </Link>
-          );
-        })}
-      </div>
+      {/* Use the reusable ProductList component with an initial limit (for example, 8 products) */}
+      <ProductList products={products} initialLimit={8} />
     </main>
   );
 }
