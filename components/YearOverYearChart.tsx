@@ -37,7 +37,7 @@ function mergeStockAndIncomeData() {
     const currentDate = parseDate(record.Date);
     while (
       incomeIndex < sortedIncome.length - 1 &&
-      parseDate(sortedIncome[incomeIndex + 1].Date).getTime() <= currentDate.getTime()
+      parseDate(sortedIncome[incomeIndex + 1]!.Date).getTime() <= currentDate.getTime()
     ) {
       incomeIndex++;
     }
