@@ -62,7 +62,7 @@ export default function Table112Chart() {
 
 
   return (
-    <div className="w-full h-[400px] p-4 border bg-white">
+    <div className="w-full h-[400px]">
       <ResponsiveContainer width="100%" height="100%">
         <LineChart data={data}>
           <XAxis dataKey="year" />

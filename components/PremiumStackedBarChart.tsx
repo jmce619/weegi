@@ -38,7 +38,7 @@ const premiumData: PremiumData[] = [
 
 export default function PremiumStackedBarChart() {
   return (
-    <div className="w-full h-[500px] p-2 border bg-white">
+    <div className="w-full h-[500px]">
       <ResponsiveContainer width="100%" height="100%">
         <BarChart
           layout="vertical"

@@ -94,24 +94,7 @@ export default function RebasedChart() {
           <Line type="monotone" dataKey="RebasedIncome" name="Median Income" stroke="black" dot={false} />
         </LineChart>
       </ResponsiveContainer>
-      {/* Custom legend overlay */}
-      <div
-        style={{
-          position: 'absolute',
-          top: 20,
-          left: 70,
-          fontSize: '9px',
-          backgroundColor: 'rgba(255, 255, 255, 0.7)',
-          padding: '5px',
-          borderRadius: '4px'
-        }}
-      >
-        <div style={{ color: 'red' }}>UNH</div>
-        <div style={{ color: 'blue' }}>Centene</div>
-        <div style={{ color: 'green' }}>Cigna</div>
-        <div style={{ color: 'orange' }}>Aetna</div>
-        <div style={{ color: 'black' }}>Median Income</div>
-      </div>
+      
     </div>
   );
 }

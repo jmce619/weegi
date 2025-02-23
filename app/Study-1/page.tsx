@@ -63,7 +63,7 @@ function InteractiveLineChart() {
   );
 
   return (
-    <div className="w-full h-[500px] p-2 border bg-white">
+    <div className="w-full h-[500px]">
       <ResponsiveContainer width="100%" height="100%">
         <LineChart data={chartData}>
           <XAxis dataKey="year" />
@@ -313,10 +313,10 @@ export default function StudyOnePage() {
   return (
     <div className="max-w-4xl mx-auto px-4">
       {/* --- Tabs Section --- */}
-      <div className="mb-4 flex border-b">
+      <div className="mb-4 flex">
         <button
           onClick={() => setActiveTab('cumulative')}
-          className={`mr-4 pb-2 ${activeTab === 'cumulative' ? 'border-b-2 border-red-600 font-bold' : 'text-neutral-600'}`}
+          className={`mr-4 pb-2 ${activeTab === 'cumulative' ? ' border-red-600 font-bold' : 'text-neutral-600'}`}
         >
           Cumulative % Change
         </button>
@@ -335,19 +335,19 @@ export default function StudyOnePage() {
       </div>
 
       {/* --- Chart Container for Tabbed Charts --- */}
-      <div className="w-full h-[500px] p-2 border">
+      <div className="w-full h-[500px]">
         <ResponsiveContainer width="100%" height="100%">
           {chartContent}
         </ResponsiveContainer>
       </div>
 
       {/* --- Description Under Tabbed Chart --- */}
-      <div className="mt-4 p-2 bg-gray-50 border rounded">
+      <div className="mt-4 p-2">
         <p className="text-sm text-gray-700">{description}</p>
       </div>
 
       {/* --- Premiums and Claims Section --- */}
-      <div className="mt-6 p-4 rounded">
+      <div className=" rounded">
         <h2 className="text-xl font-bold mb-4">Premiums and Claims</h2>
         <div className="flex gap-4">
           <div className="w-[70%] h-[500px]">
