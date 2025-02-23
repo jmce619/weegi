@@ -1,0 +1,17 @@
+﻿"Title: Marketplace Average Benchmark Premiums, 2014-2025 | KFF"
+"Timeframe: 2014 - 2025"
+"Location","2014__Average Benchmark Premium","2015__Average Benchmark Premium","2016__Average Benchmark Premium","2017__Average Benchmark Premium","2018__Average Benchmark Premium","2019__Average Benchmark Premium","2020__Average Benchmark Premium","2021__Average Benchmark Premium","2022__Average Benchmark Premium","2023__Average Benchmark Premium","2024__Average Benchmark Premium","2025__Average Benchmark Premium"
+"Alabama","256","264","297","469","558","546","553","590","597","567","564","$535"
+"Maine","325","321","335","385","588","544","513","440","427","457","515","$546"
+"New York","343","380","393","454","506","569","610","597","592","627","736","$790"
+"North Dakota","284","303","330","352","377","457","383","493","497","475","486","$537"
+"Tennessee","197","233","287","472","743","548","511","466","445","473","501","$516"
+"West Virginia","281","289","359","472","545","596","628","654","752","824","847","$919"
+
+"Notes"
+"Premiums were analyzed using the second-lowest cost silver (benchmark) premium for a 40-year-old in each county and weighted by county plan selections, including premiums for non-Essential Health Benefits. In some state-based marketplaces, the premium data for some years are at the rating area level or zip level and are mapped to counties before weighting by county plan selections."
+
+"Sources"
+"KFF analysis of data from Healthcare.gov, state rate review websites, state plan finder tools, and state provided data, October 2024."
+
+
