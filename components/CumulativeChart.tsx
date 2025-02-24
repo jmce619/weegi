@@ -44,7 +44,7 @@ function mergeStockAndIncomeData() {
     // Move the pointer until we find the first stock record with a date after the income date.
     while (
       stockIndex < unhData.length &&
-      parseDate(unhData[stockIndex].Date).getTime() <= incomeDate.getTime()
+      parseDate(unhData[stockIndex]!.Date).getTime() <= incomeDate.getTime()
     ) {
       stockIndex++;
     }
@@ -54,7 +54,7 @@ function mergeStockAndIncomeData() {
 
     return {
       Date: incomeRecord.Date, // Use the income date as the merged date
-      UNH: stockRecord.Close,
+      UNH: stockRecord!.Close,
       Centene: centeneData[matchedIndex] ? centeneData[matchedIndex].Close : null,
       Cigna: cignaData[matchedIndex] ? cignaData[matchedIndex].Close : null,
       Aetna: aetnaData[matchedIndex] ? aetnaData[matchedIndex].Close : null,
