@@ -313,38 +313,7 @@ export default function StudyOnePage() {
   return (
     <div className="max-w-4xl mx-auto px-4">
       {/* --- Tabs Section --- */}
-      <div className="mb-4 flex">
-        <button
-          onClick={() => setActiveTab('cumulative')}
-          className={`mr-4 pb-2 ${activeTab === 'cumulative' ? ' border-red-600 font-bold' : 'text-neutral-600'}`}
-        >
-          Cumulative % Change
-        </button>
-        <button
-          onClick={() => setActiveTab('rebased')}
-          className={`mr-4 pb-2 ${activeTab === 'rebased' ? 'border-b-2 border-red-600 font-bold' : 'text-neutral-600'}`}
-        >
-          Rebased to 100
-        </button>
-        <button
-          onClick={() => setActiveTab('yoy')}
-          className={`mr-4 pb-2 ${activeTab === 'yoy' ? 'border-b-2 border-red-600 font-bold' : 'text-neutral-600'}`}
-        >
-          Year over Year % Change
-        </button>
-      </div>
-
-      {/* --- Chart Container for Tabbed Charts --- */}
-      <div className="w-full h-[500px]">
-        <ResponsiveContainer width="100%" height="100%">
-          {chartContent}
-        </ResponsiveContainer>
-      </div>
-
-      {/* --- Description Under Tabbed Chart --- */}
-      <div className="mt-4 p-2">
-        <p className="text-sm text-gray-700">{description}</p>
-      </div>
+      
 
       {/* --- Premiums and Claims Section --- */}
 {/* --- Premiums and Claims Section --- */}
@@ -426,6 +395,39 @@ export default function StudyOnePage() {
   KFF data shows that employees' share of their premiums are also on the rise, with a worker with family coverage typically paying premiums of $5,700 per year in 2017, the most recent year for that data, up from about $1,600 in 2000. The average family deductible — the amount paid out-of-pocket before insurance kicks in — has increased from $2,500 in 2013 to $3,700 in 2023, according to KFF.
         </p>
 </div>
+
+<div className="mb-4 flex">
+        <button
+          onClick={() => setActiveTab('cumulative')}
+          className={`mr-4 pb-2 ${activeTab === 'cumulative' ? ' border-red-600 font-bold' : 'text-neutral-600'}`}
+        >
+          Cumulative % Change
+        </button>
+        <button
+          onClick={() => setActiveTab('rebased')}
+          className={`mr-4 pb-2 ${activeTab === 'rebased' ? 'border-b-2 border-red-600 font-bold' : 'text-neutral-600'}`}
+        >
+          Rebased to 100
+        </button>
+        <button
+          onClick={() => setActiveTab('yoy')}
+          className={`mr-4 pb-2 ${activeTab === 'yoy' ? 'border-b-2 border-red-600 font-bold' : 'text-neutral-600'}`}
+        >
+          Year over Year % Change
+        </button>
+      </div>
+
+      {/* --- Chart Container for Tabbed Charts --- */}
+      <div className="w-full h-[500px]">
+        <ResponsiveContainer width="100%" height="100%">
+          {chartContent}
+        </ResponsiveContainer>
+      </div>
+
+      {/* --- Description Under Tabbed Chart --- */}
+      <div className="mt-4 p-2">
+        <p className="text-sm text-gray-700">{description}</p>
+      </div>
 
     </div>
   );
