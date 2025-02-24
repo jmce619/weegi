@@ -37,7 +37,7 @@ export function Navbar() {
         </Link>
 
         {/* CENTER: Always centered red text */}
-        <div className="absolute left-1/4 top-1/4 transform -translate-x-1/4 -translate-y-1/4">
+        <div className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2">
         <p className="text-xs md:text-sm font-bold text-red-600">
           100% of Profits to Healthcare Charities.
         </p>
