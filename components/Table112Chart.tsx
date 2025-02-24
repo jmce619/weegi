@@ -58,14 +58,15 @@ export default function Table112Chart() {
     return <g key={`dotB-${index}`}>{dot}</g>;
   };
 
-  // Custom dot render function for ValueC with filled dots to mask the line
-
-
   return (
     <div className="w-full h-[400px]">
       <ResponsiveContainer width="100%" height="100%">
         <LineChart data={data}>
-          <XAxis dataKey="year" />
+          <XAxis 
+            dataKey="year" 
+            type="category"
+            tickFormatter={(tick) => tick.toString()}
+          />
           <YAxis />
           <Tooltip />
           <Legend />

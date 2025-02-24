@@ -7,17 +7,17 @@ import Table112Chart from 'components/Table112Chart';
 import YearOverYearChart from 'components/YearOverYearChart';
 import { useEffect, useState } from 'react';
 import {
-    Bar,
-    BarChart,
-    Cell,
-    LabelList,
-    Legend,
-    Line,
-    LineChart,
-    ResponsiveContainer,
-    Tooltip,
-    XAxis,
-    YAxis
+  Bar,
+  BarChart,
+  Cell,
+  LabelList,
+  Legend,
+  Line,
+  LineChart,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis
 } from 'recharts';
 
 // Interface for the cleaned pivot data (for pivot table and interactive chart)
@@ -347,39 +347,86 @@ export default function StudyOnePage() {
       </div>
 
       {/* --- Premiums and Claims Section --- */}
-      <div className=" rounded">
-        <h2 className="text-xl font-bold mb-4">Premiums and Claims</h2>
-        <div className="flex gap-4">
-          <div className="w-[70%] h-[500px]">
+{/* --- Premiums and Claims Section --- */}
+    <div className="rounded">
+      <h2 className="text-xl font-bold mb-4">Premiums and Claims</h2>
+      <div className="flex gap-4">
+        {/* Interactive Chart and Caption */}
+        <div className="flex flex-col w-[70%]">
+          <div className="h-[500px]">
             <InteractiveLineChart />
           </div>
-          <div className="w-[30%] h-[500px]">
+          <p className="text-xs text-center text-neutral-500">
+            Marketplace Average Benchmark Premiums (2014 - 2025). 
+          </p>
+          <p className="text-xs text-center text-neutral-500">
+            Source: https://www.kff.org/affordable-care-act/
+          </p>
+        </div>
+        {/* Premium Stacked Bar Chart and Caption */}
+        <div className="flex flex-col w-[30%]">
+          <div className="h-[500px]">
             <PremiumStackedBarChart />
           </div>
+          <p className="text-xs text-center text-neutral-500 mt-2">
+            Average Annual Worker and Employed Contributions to Premiums and Total Premiums for Family Coverage (2000 - 2024)
+          </p>
         </div>
+      </div>
+    </div>
+    <div className="mt-6 p-4 ">
+        <h3 className="text-lg font-bold mb-2">Notes</h3>
+        <p className="text-sm text-gray-700">
+          Premiums were analyzed using the second-lowest cost silver (benchmark) premium for a 40-year-old in each county and weighted by county plan selections, including premiums for non-Essential Health Benefits. In some state-based marketplaces, the premium data for some years are at the rating area level or zip level and are mapped to counties before weighting by county plan selections.
+        </p>
       </div>
 
       {/* --- Clean Data Pivot Table Section --- */}
       <CleanDataPivotTable />
 
       {/* --- Claims Overview Section --- */}
+{/* --- Claims Denial Rates Section --- */}
       <div className="mt-6 p-4">
         <h2 className="text-xl font-bold mb-4">Claims Denial Rates</h2>
         <div className="flex gap-4">
-          <div className="w-1/2 h-[400px]">
-            <ClaimDenialChart />
+          {/* Claim Denial Chart and Caption */}
+          <div className="flex flex-col w-1/2">
+            <div className="h-[400px] relative">
+              <ClaimDenialChart />
+            </div>
+            <p className="text-xs text-center text-neutral-500 mt-2">
+              Claim Denial Rates by Provider (2024)
+            </p>
           </div>
-          <div className="w-1/2 h-[400px]">
-            <NewClaimBarChart />
+          {/* New Claim Bar Chart and Caption */}
+          <div className="flex flex-col w-1/2">
+            <div className="h-[400px] relative">
+              <NewClaimBarChart />
+            </div>
+            <p className="text-xs text-center text-neutral-500 mt-2">
+              Claim Denial Rates by State (2020)
+            </p>
           </div>
         </div>
       </div>
 
       {/* --- Table 1.12 Time Series Section with Annotations --- */}
-      <div className="mt-6 p-4">
-        <h2 className="text-xl font-bold mb-4">Rising Cost of Health Insurance</h2>
-        <Table112Chart />
-      </div>
+{/* --- Table 1.12 Time Series Section with Annotations --- */}
+<div className="mt-6 p-4">
+  <h2 className="text-xl font-bold mb-4">Rising Cost of Health Insurance</h2>
+  <div className="flex flex-col">
+    <div className="w-full">
+      <Table112Chart />
+    </div>
+    <p className="text-sm text-center text-neutral-500 mt-1">
+    During the past 25 years, the cost of health insurance has surged, outpacing inflation. At the same time, many Americans are facing higher deductibles, which has also increased their out-of-pocket costs.
+    </p>
+  </div>
+  <p className="text-s text-gray-700 mt-6">
+  KFF data shows that employees' share of their premiums are also on the rise, with a worker with family coverage typically paying premiums of $5,700 per year in 2017, the most recent year for that data, up from about $1,600 in 2000. The average family deductible — the amount paid out-of-pocket before insurance kicks in — has increased from $2,500 in 2013 to $3,700 in 2023, according to KFF.
+        </p>
+</div>
+
     </div>
   );
 }
