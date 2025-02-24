@@ -42,4 +42,4 @@ export default async function Page(props: { params: Promise<{ page: string }> })
       </p>
     </>
   );
-}
+} 
