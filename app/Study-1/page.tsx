@@ -338,7 +338,7 @@ export default function StudyOnePage() {
             <PremiumStackedBarChart />
           </div>
           <p className="text-xs text-center text-neutral-500 mt-2">
-            Average Annual Worker and Employed Contributions to Premiums and Total Premiums for Family Coverage (2000 - 2024)
+            Average Annual Worker and Employed Contributions to Premiums for Family Coverage (2000 - 2024)
           </p>
         </div>
       </div>
