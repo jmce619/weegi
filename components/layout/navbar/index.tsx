@@ -25,23 +25,21 @@ export function Navbar() {
       <nav className="relative flex items-center justify-between p-4 shadow">
         {/* LEFT: Logo */}
         <Link href="/" className="shrink-0">
-        <div className="relative w-40 h-12"> 
-          {/* w-40 = 10rem, h-12 = 3rem; adjust as needed */}
-          <Image
-            src="/weegi_full_logo.png"
-            alt="My Brand Logo"
-            fill
-            style={{ objectFit: 'contain' }}
-            priority
-          />
-        </div>
-      </Link>
+          <div className="relative w-40 h-12">
+            <Image
+              src="/weegi_full_logo.png"
+              alt="My Brand Logo"
+              fill
+              style={{ objectFit: 'contain' }}
+              priority
+            />
+          </div>
+        </Link>
 
-
-        {/* CENTER: Positioned text in red (visible only on medium and larger screens) */}
-        <div className="hidden md:absolute md:left-1/2 md:top-1/2 md:-translate-x-1/2 md:-translate-y-1/2">
+        {/* CENTER: Always centered red text */}
+        <div className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2">
           <p className="text-sm font-bold text-red-600">
-            100% Of Profits Going To HCFA, Families USA, And Others.
+            100% of Profits to Healthcare Charities.
           </p>
         </div>
 
@@ -59,23 +57,9 @@ export function Navbar() {
           </ul>
 
           {/* Mobile Hamburger Menu Button */}
-          <button
-            onClick={toggleMobileMenu}
-            className="md:hidden"
-            aria-label="Toggle Menu"
-          >
-            <svg
-              className="h-6 w-6 text-neutral-600"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M4 6h16M4 12h16M4 18h16"
-              />
+          <button onClick={toggleMobileMenu} className="md:hidden" aria-label="Toggle Menu">
+            <svg className="h-6 w-6 text-neutral-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
             </svg>
           </button>
 

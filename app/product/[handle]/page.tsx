@@ -99,7 +99,7 @@ export default async function ProductPage(props: { params: Promise<{ handle: str
           </div>
 
           <div className="basis-full lg:basis-2/6">
-            <Suspense fallback={null}>
+            <Suspense fallback={null}> c
               <ProductDescription product={product} />
             </Suspense>
           </div>
