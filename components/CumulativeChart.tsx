@@ -18,7 +18,8 @@ function parseDate(dateStr: string): Date {
 }
 
 /**
- * Merge daily UNH data with median income data.
+ * Merge daily stock data with annual median income data.
+ * This version creates merged records only for dates when median income is recorded.
  */
 function mergeStockAndIncomeData() {
   const unhData = combinedData.unh_data || [];
@@ -27,30 +28,40 @@ function mergeStockAndIncomeData() {
   const aetnaData = combinedData.aetna_data || [];
   const incomeData = combinedData.median_income || [];
 
+  // Sort median income data by date
   const sortedIncome = [...incomeData].sort(
     (a, b) => parseDate(a.Date).getTime() - parseDate(b.Date).getTime()
   );
-  // Fallback: use earliest income value.
+  // Use the first income value as a fallback baseline if needed.
   const baselineIncome = sortedIncome[0]!.Income;
 
-  let incomeIndex = 0;
-  const merged = unhData.map((record, i) => {
-    const currentDate = parseDate(record.Date);
+  // Pointer for stock data
+  let stockIndex = 0;
+
+  const merged = sortedIncome.map((incomeRecord) => {
+    const incomeDate = parseDate(incomeRecord.Date);
+
+    // Move the pointer until we find the first stock record with a date after the income date.
     while (
-      incomeIndex < sortedIncome.length - 1 &&
-      parseDate(sortedIncome[incomeIndex + 1]!.Date).getTime() <= currentDate.getTime()
+      stockIndex < unhData.length &&
+      parseDate(unhData[stockIndex].Date).getTime() <= incomeDate.getTime()
     ) {
-      incomeIndex++;
+      stockIndex++;
     }
+    // The record we want is the last one on or before the income date.
+    const matchedIndex = stockIndex > 0 ? stockIndex - 1 : 0;
+    const stockRecord = unhData[matchedIndex];
+
     return {
-      Date: record.Date,
-      UNH: record.Close,
-      Centene: centeneData[i] ? centeneData[i].Close : null,
-      Cigna: cignaData[i] ? cignaData[i].Close : null,
-      Aetna: aetnaData[i] ? aetnaData[i].Close : null,
-      Income: sortedIncome[incomeIndex]?.Income ?? baselineIncome
+      Date: incomeRecord.Date, // Use the income date as the merged date
+      UNH: stockRecord.Close,
+      Centene: centeneData[matchedIndex] ? centeneData[matchedIndex].Close : null,
+      Cigna: cignaData[matchedIndex] ? cignaData[matchedIndex].Close : null,
+      Aetna: aetnaData[matchedIndex] ? aetnaData[matchedIndex].Close : null,
+      Income: incomeRecord.Income
     };
   });
+
   return merged;
 }
 
@@ -105,7 +116,6 @@ export default function CumulativeChart() {
     <div className="w-full h-full p-1 relative">
       <ResponsiveContainer width="100%" height="100%">
         <LineChart data={cumData} margin={{ top: 5, right: 5, bottom: 5, left: 5 }}>
-          {/* Removed <CartesianGrid strokeDasharray="3 3" /> */}
           <XAxis
             dataKey="Date"
             tickFormatter={(tick) => new Date(tick).getFullYear().toString()}
