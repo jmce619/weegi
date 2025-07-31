@@ -89,7 +89,7 @@ function InteractiveLineChart() {
 // Component for displaying the clean data as a pivot table (states as rows, years as columns)
 function CleanDataPivotTable() {
   const [pivotData, setPivotData] = useState<any[]>([]);
-  const [years, setYears] = useState<number[]>([]);
+  const [years, setYears] = useState<number[]>([]); 
   const [states, setStates] = useState<string[]>([]);
 
   useEffect(() => {
